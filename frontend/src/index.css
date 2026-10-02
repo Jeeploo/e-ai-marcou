@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-family: system-ui, sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+}
