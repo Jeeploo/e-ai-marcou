@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.schemas.agendamentos import AgendamentoCreate, AgendamentoResponse
+from app.schemas.agendamentos import AgendamentoCreate, AgendamentoReagendar, AgendamentoResponse
 from app.services.agendamentos import AgendamentoService, get_agendamento_service
 
 router = APIRouter(prefix="/agendamentos", tags=["Agendamentos"])
@@ -17,3 +17,19 @@ def create_agendamento(agendamento: AgendamentoCreate, service: ServiceDependenc
 @router.get("", response_model=list[AgendamentoResponse])
 def list_agendamentos(service: ServiceDependency, pacienteId: str | None = None) -> list[AgendamentoResponse]:
     return service.list(pacienteId=pacienteId)
+
+
+@router.get("/{agendamento_id}", response_model=AgendamentoResponse)
+def get_agendamento(agendamento_id: str, service: ServiceDependency) -> AgendamentoResponse:
+    return service.get_by_id(agendamento_id)
+
+
+@router.delete("/{agendamento_id}", response_model=AgendamentoResponse)
+def cancel_agendamento(agendamento_id: str, service: ServiceDependency) -> AgendamentoResponse:
+    return service.cancel(agendamento_id)
+
+
+@router.patch("/{agendamento_id}/reagendar", response_model=AgendamentoResponse)
+def reschedule_agendamento(agendamento_id: str, body: AgendamentoReagendar,
+                          service: ServiceDependency) -> AgendamentoResponse:
+    return service.reschedule(agendamento_id, body.novoHorarioId)

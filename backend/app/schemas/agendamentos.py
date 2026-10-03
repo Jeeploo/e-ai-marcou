@@ -13,6 +13,12 @@ class AgendamentoCreate(BaseModel):
     horarioId: str = Field(min_length=1)
 
 
+class AgendamentoReagendar(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    novoHorarioId: str = Field(min_length=1)
+
+
 class AgendamentoResponse(BaseModel):
     id: str
     pacienteId: str
@@ -22,5 +28,5 @@ class AgendamentoResponse(BaseModel):
     data: Data
     hora: Hora
     valor: float = Field(ge=0, allow_inf_nan=False)
-    status: Literal["agendado"]
+    status: Literal["agendado", "cancelado"]
     criadoEm: datetime
