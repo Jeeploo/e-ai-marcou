@@ -22,5 +22,12 @@ class ProfissionalRepository:
         ]
 
 
+    def get_by_id(self, document_id: str) -> ProfissionalResponse | None:
+        document = self.client.collection("profissionais").document(document_id).get()
+        if not document.exists:
+            return None
+        return ProfissionalResponse(**{**document.to_dict(), "id": document.id})
+
+
 def get_profissional_repository() -> ProfissionalRepository:
     return ProfissionalRepository(get_firestore_client())

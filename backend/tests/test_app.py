@@ -29,9 +29,9 @@ def test_openapi_is_available():
     assert response.status_code == 200
     document = response.json()
     assert document["info"]["title"] == settings.app_name
-    assert set(document["paths"]) == {"/api/health", "/api/especialidades", "/api/clinicas", "/api/profissionais"}
+    assert set(document["paths"]) == {"/api/health", "/api/especialidades", "/api/clinicas", "/api/profissionais", "/api/horarios", "/api/agendamentos"}
     assert "get" in document["paths"]["/api/health"]
     assert set(document["paths"]["/api/especialidades"]) == {"get", "post"}
 
-    for path in ("/api/clinicas", "/api/profissionais"):
+    for path in ("/api/clinicas", "/api/profissionais", "/api/horarios", "/api/agendamentos"):
         assert set(document["paths"][path]) == {"get", "post"}
