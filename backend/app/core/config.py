@@ -7,6 +7,10 @@ from pydantic import BaseModel, Field
 
 class Settings(BaseModel):
     app_name: str = Field(default="e aí, marcou?", min_length=1)
+    cors_origins: list[str] = Field(default_factory=lambda: [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ])
     firebase_credentials: str | None = None
     firebase_project_id: str | None = None
 
