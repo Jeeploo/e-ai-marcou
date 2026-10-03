@@ -23,6 +23,12 @@ class EspecialidadeRepository:
             for document in documents
         ]
 
+    def get_by_id(self, document_id: str) -> EspecialidadeResponse | None:
+        document = self.client.collection("especialidades").document(document_id).get()
+        if not document.exists:
+            return None
+        return EspecialidadeResponse(**{**document.to_dict(), "id": document.id})
+
 
 def get_especialidade_repository() -> EspecialidadeRepository:
     return EspecialidadeRepository(get_firestore_client())
