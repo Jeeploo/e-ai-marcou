@@ -281,6 +281,8 @@ export const catalogApi = {
         endereco: string;
         cidade: string;
         uf: string;
+        latitude?: number;
+        longitude?: number;
       }[]
     >("/api/clinicas"),
 };

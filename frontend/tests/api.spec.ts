@@ -355,3 +355,126 @@ test("foto da API aparece e retorna às iniciais se falhar; suporte configuráve
     page.getByRole("link", { name: "Falar com o suporte" }),
   ).toHaveAttribute("href", "mailto:suporte@example.com");
 });
+
+test("GPS: consentimento, distância, ordenação, rota e remoção", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["geolocation"]);
+  await context.setGeolocation({ latitude: 0, longitude: 0, accuracy: 20 });
+  await page.route("http://127.0.0.1:8000/api/**", async (route) => {
+    const path = new URL(route.request().url()).pathname;
+    const json = path.endsWith("/profissionais")
+      ? [
+          {
+            id: "longe",
+            nome: "Profissional distante",
+            clinicaId: "longe",
+            valorConsulta: 100,
+          },
+          {
+            id: "perto",
+            nome: "Profissional próximo",
+            clinicaId: "perto",
+            valorConsulta: 200,
+          },
+          {
+            id: "sem",
+            nome: "Sem coordenadas",
+            clinicaId: "sem",
+            valorConsulta: 50,
+          },
+        ]
+      : path.endsWith("/clinicas")
+        ? [
+            {
+              id: "longe",
+              nome: "Clínica distante",
+              latitude: 0,
+              longitude: 1,
+              endereco: "Rua A",
+              cidade: "Cidade",
+              uf: "SP",
+            },
+            {
+              id: "perto",
+              nome: "Clínica próxima",
+              latitude: 0,
+              longitude: 0.01,
+              endereco: "Rua B",
+              cidade: "Cidade",
+              uf: "SP",
+            },
+            {
+              id: "sem",
+              nome: "Clínica sem posição",
+              latitude: 100,
+              longitude: 200,
+              endereco: "Rua C",
+              cidade: "Cidade",
+              uf: "SP",
+            },
+          ]
+        : [];
+    await route.fulfill({ json });
+  });
+  await page.goto("/busca");
+  await expect(
+    page.getByRole("button", { name: "Mais próximo", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Usar minha localização", exact: true })
+    .click();
+  await expect(
+    page.getByText("1,1 km em linha reta", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("111,2 km em linha reta", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Mais próximo", exact: true }).click();
+  await expect(page.locator(".doctor-grid .doctor-card h3")).toHaveText([
+    "Profissional próximo",
+    "Profissional distante",
+    "Sem coordenadas",
+  ]);
+  await page.getByRole("button", { name: "Ver no mapa", exact: true }).click();
+  const routeLink = page.getByRole("link", {
+    name: "Traçar rota da minha localização",
+  });
+  await expect(routeLink).toHaveAttribute(
+    "href",
+    /origin=0,0&destination=0%2C0.01/,
+  );
+  await page.getByRole("button", { name: "Parar de usar localização" }).click();
+  await expect(routeLink).toHaveCount(0);
+  await expect(page.getByText(/km em linha reta/)).toHaveCount(0);
+});
+
+test("GPS: permissão negada e demora preservam a busca", async ({ page }) => {
+  await page.addInitScript(() => {
+    let count = 0;
+    Object.defineProperty(navigator, "geolocation", {
+      value: {
+        getCurrentPosition: (
+          _ok: unknown,
+          fail: (e: { code: number }) => void,
+        ) => fail({ code: ++count === 1 ? 1 : 3 }),
+      },
+    });
+  });
+  await page.route("http://127.0.0.1:8000/api/**", (route) =>
+    route.fulfill({ json: [] }),
+  );
+  await page.goto("/busca");
+  await page.getByRole("button", { name: "Usar minha localização" }).click();
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "Permissão de localização negada" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Usar minha localização" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "demorou para responder" }),
+  ).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Pesquisar" })).toBeEnabled();
+});

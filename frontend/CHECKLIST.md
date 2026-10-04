@@ -8,7 +8,7 @@ Este documento separa o frontend implementado, as dependências do backend e as 
 
 ## Como ficou a entrega
 
-As telas e os fluxos principais de busca e agendamento, os tratamentos de erro e a PWA estão implementados. Isso não significa que todo recurso citado no documento esteja completo: o perfil funciona localmente, algumas configurações aguardam dados da equipe e GPS, login, pagamentos, envio de notificações e publicação não foram feitos. O código foi enviado para a branch `frontend`, sem juntar as mudanças com `main` ou `backend`.
+As telas e os fluxos principais de busca e agendamento, os tratamentos de erro e a PWA estão implementados. Isso não significa que todo recurso citado no documento esteja completo: o perfil funciona localmente, algumas configurações aguardam dados da equipe e login, pagamentos, envio de notificações e publicação não foram feitos; a localização pelo navegador foi acrescentada nesta revisão. O código foi enviado para a branch `frontend`, sem juntar as mudanças com `main` ou `backend`.
 
 Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu conferir o que a tela envia e como reage a sucesso, erro e horário ocupado. Backend: o servidor, os dados de teste e o banco precisam estar disponíveis para a validação real. Essa validação é conjunta: qualquer incompatibilidade nas chamadas ou nas telas continua sendo responsabilidade do frontend.
 
@@ -95,7 +95,7 @@ Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu
 - [x] Não criar outro backend — foi usada a API prevista para o projeto. As respostas simuladas existem apenas para os testes.
 - [x] Não implementar autenticação agora — login ficou fora do MVP. Encerrar a sessão local não equivale a sair de uma conta autenticada.
 - [x] Não implementar pagamento — não há cobrança nem integração financeira. A escolha de pagamento no modo local é só uma preferência visual.
-- [x] Ajustar o pedido sobre mapas — a lista inicial excluía mapas, mas depois foi pedido o Google Maps. Ele foi incluído; GPS e permissão de localização não foram implementados.
+- [x] Ajustar o pedido sobre mapas — a lista inicial excluía mapas, mas depois foi pedido o Google Maps. Ele foi incluído e, por solicitação posterior, também há localização pelo navegador, com permissão explícita.
 - [x] Não enviar notificações — a tela guarda preferências locais, mas não dispara SMS, WhatsApp, e-mail ou push.
 - [x] Priorizar o fluxo principal — a entrega foi organizada em busca, profissional, horário, confirmação e agenda. Os limites dos recursos extras estão explicados abaixo.
 
@@ -189,16 +189,16 @@ Além das telas e dos fluxos listados acima:
 - [ ] Equipe/hospedagem: definir onde publicar e qual endereço usar. O build e as instruções estão prontos em PUBLICACAO.md, mas não foi publicado um site. Publicar arquivos estáticos é uma tarefa de frontend/hospedagem, não do backend.
 - [ ] Backend — Jefferson: para usar consultas reais no site publicado, disponibilizar a API por HTTPS e liberar o domínio no CORS. Depois da publicação, o frontend precisa ser conferido no endereço definitivo.
 
-## Recursos fora do MVP, sem marcar como tarefas concluídas
+## Recursos fora do MVP e alteração de escopo para GPS
 
-Estes recursos foram excluídos na lista original. Não são falhas no fluxo de agendamento nem tarefas que possam ser dadas como prontas apenas por desenhar uma tela.
+Login, pagamento e envio de notificações foram excluídos na lista original. GPS foi autorizado posteriormente e está implementado conforme a linha abaixo. Não são falhas no fluxo de agendamento nem tarefas que possam ser dadas como prontas apenas por desenhar uma tela.
 
 | Recurso | Frontend | Backend e outras dependências |
 |---|---|---|
 | Login e autorização | Não há login. Encerrar a sessão local não autentica ninguém. Se entrar no escopo, será preciso criar e conectar a interface de login. | Backend: autenticação, sessão e permissões, ou integração com um provedor definido pela equipe. |
 | Pagamento | Não há processamento financeiro. A escolha visual local não cobra. Um checkout real exigiria integração de frontend. | Backend: criar e validar cobranças e receber confirmações do provedor. Equipe: escolher o serviço e as regras. |
 | Envio de notificações | Preferências locais, sem envio. Se entrar no escopo, conectar preferências; push também requer permissão e inscrição no frontend. | Backend: guardar preferências e inscrições, programar e enviar mensagens por um provedor. O Service Worker atual cuida do cache, não envia lembretes. |
-| GPS e distância real | GPS não foi implementado. Pode ser feito no frontend com permissão do usuário; não é obrigação do backend. O pedido posterior de Google Maps foi atendido por endereço. | Backend: fornecer coordenadas das clínicas se houver comparação por distância. Não se deve apresentar as distâncias locais de exemplo como distâncias reais. |
+| GPS e distância real | Implementado: solicitação ao clicar, tratamento de recusa e demora, atualização, remoção, distância aproximada em linha reta e ordenação por proximidade. O Google Maps abre a rota por endereço ou coordenadas. | Backend — Jefferson: fornecer latitude e longitude numéricas e válidas nas clínicas. O frontend já aceita esses campos opcionais. Sem eles, a busca não inventa distâncias; a rota por endereço continua disponível. Distância pelas ruas e tempo de viagem são consultados no Google Maps. |
 | Outro backend | Não deve ser criado pelo frontend. | Backend: manter o FastAPI existente e o acesso ao Firestore. Não é uma pendência de implementação do frontend. |
 
 ## Testes e limites da confirmação
@@ -225,3 +225,24 @@ Dentro de frontend:
 VITE_API_URL, VITE_PATIENT_ID e VITE_SUPPORT_URL são configurações públicas. Nenhuma senha ou credencial do Firebase deve ser colocada nelas ou enviada ao GitHub.
 
 O código e este checklist ficam na branch frontend. Nenhum merge com main ou backend faz parte desta entrega.
+
+## Atualização: localização e proximidade
+
+- [x] Pedir localização somente depois do clique em “Usar minha localização”.
+- [x] Tratar permissão negada, indisponibilidade, demora, navegador incompatível e conexão sem HTTPS.
+- [x] Permitir atualizar a posição ou parar de usá-la. A posição fica apenas na memória da tela, sem gravar no navegador ou enviar ao backend.
+- [x] Calcular distância aproximada em linha reta com as coordenadas do dispositivo e da clínica; mostrar até uma casa decimal.
+- [x] Ordenar por proximidade, mantendo clínicas sem coordenadas no fim da lista.
+- [x] Rejeitar coordenadas inválidas e não usar distâncias fictícias na busca quando faltam dados reais.
+- [x] Abrir rota no Google Maps a partir da posição obtida. O link informa previamente que a posição será compartilhada com o Google ao abrir a rota.
+- [x] Manter busca por especialidade e endereço mesmo sem aceitar a localização.
+
+**Backend — Jefferson:** acrescentar latitude e longitude ao retorno de /api/clinicas para habilitar as distâncias das clínicas reais. O contrato atual não contém esses campos; o frontend já está preparado para recebê-los como números opcionais. Não foi inventada a localização de clínicas do catálogo local.
+
+A localização do navegador pode vir de GPS, Wi-Fi ou outras fontes; a precisão obtida é mostrada na tela. HTTPS é necessário no endereço público. Referências: [Geolocation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition) e [rotas do Google Maps](https://developers.google.com/maps/documentation/urls/get-started).
+
+### Verificação desta atualização
+
+Build aprovado. Passaram os 9 testes de API com respostas simuladas, incluindo GPS com coordenadas controladas, distância conhecida, ordenação, ausência de coordenadas, rota, remoção, permissão negada e demora. Na suíte de interface, 19 testes passaram de primeira; o teste de conflito entre abas teve uma falha na gravação do relatório por concorrência entre suítes e passou na repetição isolada. As pastas de relatório foram separadas. Também passaram acessibilidade automática, larguras de 320 a 1440px, offline e verificação de instalabilidade.
+
+O teste de GPS usa a localização controlada do navegador de testes, não o sensor de um celular físico. O restante da lista permanece com as dependências explicitadas: rotas de perfil/endereço ainda precisam ser definidas pelo backend; contato e hospedagem precisam de dados da equipe. Login, cobrança e envio de notificações continuam fora do MVP solicitado, sem serem marcados como implementados.

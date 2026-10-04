@@ -1737,3 +1737,6 @@ dialog::backdrop {
 .address-card > button + button {
   margin-left: 16px;
 }
+
+.location-controls { margin: 1rem 0; display: flex; flex-wrap: wrap; gap: .75rem; }
+.location-controls p { flex-basis: 100%; margin: 0; overflow-wrap: anywhere; }

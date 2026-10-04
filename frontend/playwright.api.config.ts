@@ -1,5 +1,6 @@
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
+  outputDir: "test-results-api",
   testDir: "./tests",
   testMatch: "api.spec.ts",
   workers: 1,

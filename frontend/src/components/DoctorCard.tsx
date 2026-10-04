@@ -24,7 +24,10 @@ export default function DoctorCard({ doctor }: { doctor: Professional }) {
         {Number.isFinite(doctor.distance) && (
           <span>
             <MapPin size={16} aria-label="Distância" />
-            {doctor.distance.toLocaleString("pt-BR")} km
+            {doctor.distance.toLocaleString("pt-BR", {
+              maximumFractionDigits: 1,
+            })}{" "}
+            km{doctor.distanceMeasured ? " em linha reta" : ""}
           </span>
         )}
       </div>

@@ -5,6 +5,8 @@ export interface Professional {
   clinic: string;
   price: number;
   distance: number;
+  coordinates?: { latitude: number; longitude: number };
+  distanceMeasured?: boolean;
   rating: number;
   initials: string;
   photoUrl?: string;

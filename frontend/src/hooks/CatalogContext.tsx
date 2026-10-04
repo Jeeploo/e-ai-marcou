@@ -1,3 +1,4 @@
+import { coordinates } from "../services/location";
 import {
   createContext,
   useContext,
@@ -49,7 +50,9 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
               typeof p.valorConsulta !== "number"
             )
               throw new Error("Formato da API incompatível");
+            const clinic = clinics.find((c) => c.id === p.clinicaId);
             return {
+              coordinates: coordinates(clinic?.latitude, clinic?.longitude),
               id: p.id,
               name: p.nome,
               specialty:

@@ -1,3 +1,5 @@
+import { useDeviceLocation } from "../hooks/useLocation";
+import { distanceKm } from "../services/location";
 import { prototypeExtras } from "../data/features";
 import { useOnline } from "../hooks/useOnline";
 import { useState } from "react";
@@ -9,6 +11,7 @@ import { professionalDetails } from "../data/catalog";
 import { demoMode } from "../services/api";
 export function SearchPage() {
   const online = useOnline();
+  const gps = useDeviceLocation();
   const { professionals, specialties, loading, error, reload } = useCatalog(),
     [params, setParams] = useSearchParams(),
     [filters, setFilters] = useState(false);
@@ -27,7 +30,16 @@ export function SearchPage() {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
-  const results = professionals
+  const located = professionals.map((p) => ({
+    ...p,
+    distance:
+      gps.position && p.coordinates
+        ? distanceKm(gps.position, p.coordinates)
+        : NaN,
+    distanceMeasured: true,
+  }));
+  const canSortDistance = located.some((p) => Number.isFinite(p.distance));
+  const results = located
     .filter(
       (p) =>
         (!specialty || p.specialty === specialty) &&
@@ -38,7 +50,8 @@ export function SearchPage() {
     )
     .sort((a, b) =>
       sort === "distancia"
-        ? a.distance - b.distance
+        ? (Number.isFinite(a.distance) ? a.distance : Infinity) -
+          (Number.isFinite(b.distance) ? b.distance : Infinity)
         : sort === "avaliacao"
           ? b.rating - a.rating
           : a.price - b.price,
@@ -99,13 +112,47 @@ export function SearchPage() {
               />
             </label>
           )}
+          <div className="location-controls">
+            <button
+              className="outline"
+              onClick={gps.locate}
+              disabled={gps.busy}
+            >
+              {gps.busy
+                ? "Buscando localização…"
+                : gps.position
+                  ? "Atualizar minha localização"
+                  : "Usar minha localização"}
+            </button>
+            {(gps.position || gps.busy) && (
+              <button className="outline" onClick={gps.clear}>
+                Parar de usar localização
+              </button>
+            )}
+            <p>
+              Sua localização fica apenas nesta tela. Ao abrir uma rota, ela
+              será compartilhada com o Google Maps.
+            </p>
+            {gps.message && <p role="status">{gps.message}</p>}
+            {gps.position && (
+              <p>
+                {canSortDistance
+                  ? "Distâncias aproximadas em linha reta. O trajeto pelas ruas pode ser maior."
+                  : "As clínicas ainda não informaram suas coordenadas. Você pode consultar o trajeto pelo endereço no Google Maps."}
+              </p>
+            )}
+          </div>
           <div className="filter-row">
             {[
               ["preco", "Menor preço"],
               ["distancia", "Mais próximo"],
               ["avaliacao", "Melhor avaliação"],
             ]
-              .filter(([key]) => demoMode || key === "preco")
+              .filter(
+                ([key]) =>
+                  key === "preco" ||
+                  (key === "distancia" ? canSortDistance : demoMode),
+              )
               .map(([value, label]) => (
                 <button
                   className="filter"
@@ -214,6 +261,16 @@ export function SearchPage() {
             {active && (
               <div className="map-preview">
                 <DoctorCard doctor={active} />
+                {gps.position && online && (
+                  <a
+                    className="outline button-wide"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`https://www.google.com/maps/dir/?api=1&origin=${gps.position.latitude},${gps.position.longitude}&destination=${encodeURIComponent(active.coordinates ? `${active.coordinates.latitude},${active.coordinates.longitude}` : mapAddress)}`}
+                  >
+                    Traçar rota da minha localização
+                  </a>
+                )}
                 <a
                   className="outline button-wide"
                   target="_blank"
