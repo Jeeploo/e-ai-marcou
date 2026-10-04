@@ -41,7 +41,6 @@ test("mapa Google acompanha a clínica selecionada", async ({ page }) => {
 test("inspeção visual, console e critérios de instalação", async () => {
   const dir = await mkdtemp(join(tmpdir(), "marcou-pwa-"));
   const context = await chromium.launchPersistentContext(dir, {
-    channel: "msedge",
     headless: true,
     baseURL: "http://127.0.0.1:4173",
   });
