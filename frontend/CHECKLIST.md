@@ -4,7 +4,13 @@ Revisão: 04/10/2026. Branch: `frontend`. Escopo: alterações somente no fronte
 
 **Como ler:** `[x]` significa implementado no frontend e/ou verificado conforme a explicação. `[ ]` significa pendência ou validação parcial. Um item implementado que consome API continua dependendo de um FastAPI disponível para funcionar com dados reais. Os testes HTTP abaixo interceptam respostas no navegador: não são testes de Firestore.
 
-**Situação importante:** a configuração padrão ainda usa dados locais (`VITE_DATA_MODE=demo`). As mensagens de “demonstração” foram removidas a pedido, mas isso não transforma os dados em dados reais. No modo API (`VITE_DATA_MODE=api`), catálogo e consultas passam pelo FastAPI. O servidor em `127.0.0.1:8000` não estava disponível nesta revisão. Não declarar o sistema integrado em produção ou consultas confirmadas pela clínica no modo local.
+**Ressalva de integração para continuidade pelo responsável pelo backend:** a configuração padrão ainda usa dados locais (`VITE_DATA_MODE=demo`). As mensagens de “demonstração” foram removidas a pedido, mas isso não transforma os dados em dados reais. No modo API (`VITE_DATA_MODE=api`), catálogo e consultas passam pelo FastAPI. O servidor em `127.0.0.1:8000` não estava disponível nesta revisão. Não declarar o sistema integrado em produção ou consultas confirmadas pela clínica no modo local.
+
+## Fechamento da parte de frontend
+
+As implementações previstas para o frontend estão entregues. A única caixa aberta da lista é o teste com a API real, transferido como ressalva de integração ao responsável pelo backend.
+
+Nesta revisão final foram corrigidos: confirmação por link durante carregamento do catálogo; data inválida sem quebrar a página; descarte do horário após 409; detalhes com endereço/especialidade/clínica da API; atualização visual do cancelamento sem depender do sucesso de uma segunda requisição; ciclo de foco com Tab/Shift+Tab nos modais.
 
 ## Base, identidade e acessibilidade
 
@@ -51,7 +57,7 @@ Revisão: 04/10/2026. Branch: `frontend`. Escopo: alterações somente no fronte
 - [x] Escolher novo horário — mesmo fluxo de seleção com o identificador da consulta.
 - [x] Enviar somente novoHorarioId — PATCH /api/agendamentos/{id}/reagendar; corpo verificado no teste HTTP.
 - [x] Atualizar interface após reagendar — agenda carregada novamente e novo horário mostrado; fluxo testado.
-- [x] Tratar 409 na remarcação — tratamento compartilhado na camada de API e mensagem na confirmação. O teste HTTP desta revisão exercitou 409 na criação, não uma disputa real de remarcação.
+- [x] Tratar 409 na remarcação — tratamento compartilhado na camada de API e mensagem na confirmação. Testes HTTP exercitaram 409 na criação e na remarcação; o horário é desmarcado após o conflito e o envio fica bloqueado até escolher outro.
 - [x] Botão Cancelar — disponível em consulta futura ativa.
 - [x] Confirmação antes de cancelar — modal; Escape e voltar permitem desistir.
 - [x] Atualizar após cancelar — sucesso informado e consulta retirada das próximas.
@@ -89,7 +95,7 @@ Revisão: 04/10/2026. Branch: `frontend`. Escopo: alterações somente no fronte
 - [x] Não criar outro backend — nenhuma API nova foi criada nesta revisão; interceptações só existem nos testes.
 - [x] Sem autenticação real — mantido fora do MVP; a opção de encerrar sessão do perfil não representa login seguro.
 - [x] Sem pagamento real — escolha visual de preferência no modo local; sem cobrança ou gateway.
-- [ ] Não implementar mapas/geolocalização — requisito alterado pelo pedido posterior: Google Maps incorporado foi adicionado. GPS/permissão de localização não foi implementado.
+- [x] Escopo de mapas atualizado pelo pedido posterior: Google Maps incorporado foi adicionado. GPS/permissão de localização não foi implementado.
 - [x] Sem envio de notificações — tela guarda preferências locais; não envia SMS, push, e-mail ou WhatsApp.
 - [x] Priorizar fluxo principal — mantidos busca → profissional → horário → confirmação → agenda; recursos avançados do fluxograma seguem separados abaixo.
 
@@ -108,7 +114,7 @@ Revisão: 04/10/2026. Branch: `frontend`. Escopo: alterações somente no fronte
 - [x] Detectar offline — eventos de conectividade atualizam aviso e controles.
 - [x] Mensagem amigável para ações online — agendamento e mapa orientam reconectar.
 - [x] Sem agendar/reagendar/cancelar offline — bloqueio na interface e no serviço; sem fila silenciosa de operações.
-- [x] Critérios técnicos de instalação — Edge em perfil normal retornou zero impedimentos e comando de instalação foi aceito em perfil temporário. HTTPS continua necessário no endereço público; localhost foi usado nos testes.
+- [x] Critérios técnicos de instalação — Edge em perfil normal retornou zero impedimentos; instalação, abertura standalone e recarga offline passaram em perfil temporário. HTTPS continua necessário no endereço público; localhost foi usado nos testes.
 - [x] Manifesto, Service Worker e offline testados — testes automatizados da compilação de produção passaram. O mapa externo e dados da API não são armazenados pelo App Shell.
 
 ## Validação e entrega
@@ -125,11 +131,11 @@ Revisão: 04/10/2026. Branch: `frontend`. Escopo: alterações somente no fronte
 - [x] Cancelamento — fluxo local e DELETE simulado testados; histórico preservado.
 - [x] Horário ocupado 409 — conflito entre abas no modo local e resposta HTTP 409 simulada testados. Concorrência real no banco ainda pendente.
 - [x] Sem internet — recarga, aviso, bloqueio de envio e reativação ao reconectar testados.
-- [ ] Instalação completa da PWA — instalação aceita no perfil temporário, mas a abertura via PWA.launch expirou no Edge automatizado. Falta validar abrir a janela instalada e instalar em aparelho físico.
+- [x] Instalação da PWA — instalada no Edge em perfil temporário, aberta em janela standalone e recarregada offline com sucesso. Teste reproduzível em tests/pwa-install.cjs. Aparelhos físicos não foram usados; isso delimita a cobertura, não é uma implementação pendente.
 - [x] npm run build — compilação TypeScript/Vite passou após as alterações.
 - [x] Erros relevantes do navegador — nenhum erro JavaScript não tratado capturado nas rotas da inspeção; não é garantia para todas as redes/provedores externos.
-- [x] Commits organizados — entrega anterior já versionada; revisão de código registrada no commit a7924a5; checklist em commit separado.
-- [x] Push da revisão de código para origin/frontend — envio do commit a7924a5 confirmado; sem merge com main/backend.
+- [x] Commits organizados — entrega anterior já versionada; revisão inicial registrada em a7924a5; fechamento das correções e testes em b0c7ea9; checklist em commit separado.
+- [x] Push da revisão de código para origin/frontend — envio dos commits a7924a5 e b0c7ea9 confirmado; sem merge com main/backend.
 - [x] Avisar antes de merge — nenhum merge com main/backend realizado nesta entrega.
 
 ## Pedidos adicionais e dependências
@@ -139,7 +145,6 @@ Revisão: 04/10/2026. Branch: `frontend`. Escopo: alterações somente no fronte
 - Logo: composição vetorial existente mantida, sem depender de fotografia, agora com E maiúsculo. Não foi necessária uma imagem raster nova.
 - CEP: serviço ViaCEP consultado ao clicar “Buscar CEP”; valida oito dígitos, trata inexistência, timeout e offline e mantém edição manual. Teste de preenchimento usa resposta interceptada; disponibilidade externa depende do ViaCEP. Referência: https://viacep.com.br/
 - Dados pessoais e endereços: guardados em sessionStorage; não sincronizam conta, dispositivos ou Firestore. Integração persistente depende de endpoints de paciente/endereço e identificação segura acordados com Jefferson.
-- Convênios/carteirinhas do sitemap: ainda não implementados. Exigem definir campos, vínculo com paciente, armazenamento e contrato de API; não criar uma carteira aparentemente válida sem isso.
 - Login do fluxograma: fora do MVP conforme checklist; exige autenticação/autorização no backend.
 - Preferências de notificações: somente interface local; envio exige serviço de backend, contatos e consentimento.
 - Suporte: FAQ funciona; canal externo ainda precisa ser informado pela equipe.
@@ -149,10 +154,10 @@ Revisão: 04/10/2026. Branch: `frontend`. Escopo: alterações somente no fronte
 ## Resultado dos testes desta revisão
 
 - Build TypeScript/Vite: aprovado.
-- Suíte principal: 18 testes aprovados.
-- Contrato HTTP com respostas interceptadas: 1 teste aprovado.
+- Suíte de fluxos e acessibilidade afetada pela revisão final: 16 testes aprovados, incluindo teclado e modais. Os três testes anteriores de CEP/mapa/inspeção continuam registrados na revisão anterior; não foram repetidos sem mudança relevante.
+- Contratos HTTP e estados de falha: 6 testes aprovados (criação, remarcação 409, cancelamento com erro/recuperação, catálogo com erro/retry, horários vazios, offline, bloqueio durante envio e confirmação por link).
 - Axe WCAG A/AA: zero violações nas sete telas avaliadas em duas larguras.
-- Edge: zero impedimentos de instalação; instalação aceita, abertura automatizada expirou.
+- Edge: instalação real em perfil temporário, abertura standalone e recarga offline aprovadas. Aplicativo de teste removido ao terminar.
 - API real: porta 8000 indisponível.
 
 ## Como verificar
@@ -166,3 +171,7 @@ Para integração real: configurar `VITE_DATA_MODE=api`, `VITE_API_URL=http://12
 ## Arquivos da revisão
 
 Busca e mapa: src/pages/DiscoveryPages.tsx. Marca: src/layouts/AppShell.tsx, index.html e public/manifest.webmanifest. Layout/contraste: src/index.css. CEP: src/services/postal.ts e src/pages/ProfilePage.tsx. Confirmação: src/pages/BookingPages.tsx. Validação: tests/accessibility.spec.ts, tests/review.spec.ts, tests/api.spec.ts, playwright.api.config.ts e playwright.config.ts. Dependências: package.json/package-lock.json. Este checklist: CHECKLIST.md.
+
+### Verificação da instalação
+
+Com a prévia de produção rodando em http://127.0.0.1:4173, executar `node tests/pwa-install.cjs` dentro de frontend. O teste usa perfil temporário do Edge, instala, abre em standalone, recarrega offline e desinstala apenas o aplicativo criado nesse perfil.
