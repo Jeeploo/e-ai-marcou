@@ -12,6 +12,7 @@ import { useCatalog } from "../hooks/CatalogContext";
 import { useOnline } from "../hooks/useOnline";
 import { currency, professionalDetails } from "../data/catalog";
 import {
+  ApiError,
   bookingService,
   dateLabel,
   day,
@@ -20,6 +21,14 @@ import {
 } from "../services/api";
 import type { Slot } from "../types/models";
 import Modal from "../components/Modal";
+function isValidDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T12:00:00Z`);
+  return (
+    Number.isFinite(parsed.getTime()) &&
+    parsed.toISOString().slice(0, 10) === value
+  );
+}
 export function ProfessionalPage() {
   const { id } = useParams(),
     { professionals, loading, error, reload } = useCatalog(),
@@ -214,7 +223,12 @@ export function ProfessionalPage() {
 export function ConfirmPage() {
   const [params] = useSearchParams(),
     navigate = useNavigate(),
-    { professionals } = useCatalog(),
+    {
+      professionals,
+      loading: catalogLoading,
+      error: catalogError,
+      reload,
+    } = useCatalog(),
     online = useOnline();
   const id = params.get("profissional") || "",
     slotId = params.get("horario") || "",
@@ -229,7 +243,10 @@ export function ConfirmPage() {
     [payment, setPayment] = useState("Pix");
   useEffect(() => {
     let active = true;
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    setSlot(undefined);
+    setLoading(true);
+    setError("");
+    if (!isValidDate(date)) {
       setLoading(false);
       setError("Escolha uma data e um horário antes de confirmar.");
       return;
@@ -259,11 +276,27 @@ export function ConfirmPage() {
         : await bookingService.create(slot.id);
       setSuccess(true);
     } catch (e) {
+      if (e instanceof ApiError && e.status === 409) setSlot(undefined);
       setError(friendlyError(e));
     } finally {
       setBusy(false);
     }
   }
+  if (catalogLoading)
+    return (
+      <div className="page-content" role="status">
+        Carregando resumo…
+      </div>
+    );
+  if (catalogError)
+    return (
+      <div className="page-content" role="alert">
+        {catalogError}
+        <button className="outline" onClick={reload}>
+          Tentar novamente
+        </button>
+      </div>
+    );
   if (!doctor)
     return (
       <div className="page-content">
@@ -293,7 +326,9 @@ export function ConfirmPage() {
               <dl>
                 <div>
                   <dt>Data</dt>
-                  <dd>{date ? dateLabel(date) : "Não selecionada"}</dd>
+                  <dd>
+                    {isValidDate(date) ? dateLabel(date) : "Não selecionada"}
+                  </dd>
                 </div>
                 <div>
                   <dt>Horário</dt>

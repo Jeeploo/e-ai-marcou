@@ -59,7 +59,12 @@ export default function AgendaPage() {
     setError("");
     try {
       await bookingService.cancel(cancel.id);
-      setItems(await bookingService.list());
+      setItems((current) =>
+        current.map((item) =>
+          item.id === cancel.id ? { ...item, status: "cancelado" } : item,
+        ),
+      );
+      setRevision((value) => value + 1);
       setCancel(undefined);
       setMessage("Consulta cancelada. Ela continua disponível no histórico.");
     } catch (e) {
@@ -227,7 +232,16 @@ export default function AgendaPage() {
           <p>
             {demoMode
               ? professionalDetails[details.profissionalId]?.address
-              : ""}
+              : professionals.find((p) => p.id === details.profissionalId)
+                  ?.address}
+          </p>
+          <p>
+            {
+              professionals.find((p) => p.id === details.profissionalId)
+                ?.specialty
+            }{" "}
+            ·{" "}
+            {professionals.find((p) => p.id === details.profissionalId)?.clinic}
           </p>
           <p>Valor: {currency(details.valor)}</p>
           <p>

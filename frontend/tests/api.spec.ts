@@ -126,3 +126,190 @@ test("contrato HTTP: criar, 409, reagendar e cancelar preservando histórico", a
     "DELETE",
   ]);
 });
+
+// Remaining frontend states are exercised without a running backend.
+async function fixture(
+  page: import("@playwright/test").Page,
+  options: { empty?: boolean; error?: boolean; delay?: Promise<void> } = {},
+) {
+  await page.route("http://127.0.0.1:8000/api/**", async (route) => {
+    const u = new URL(route.request().url());
+    if (u.pathname.endsWith("profissionais")) {
+      if (options.delay) await options.delay;
+      if (options.error)
+        return route.fulfill({
+          status: 500,
+          json: { detail: "INTERNAL_STACK_TRACE" },
+        });
+      return route.fulfill({
+        json: [
+          {
+            id: "ana",
+            nome: "Dra. Ana Lima",
+            crm: "CRM-SP 123",
+            especialidadeId: "e",
+            clinicaId: "c",
+            valorConsulta: 180,
+          },
+        ],
+      });
+    }
+    if (u.pathname.endsWith("especialidades"))
+      return route.fulfill({ json: [{ id: "e", nome: "Cardiologia" }] });
+    if (u.pathname.endsWith("clinicas"))
+      return route.fulfill({
+        json: [
+          {
+            id: "c",
+            nome: "Clínica Teste",
+            endereco: "Rua Teste, 10",
+            cidade: "São Paulo",
+            uf: "SP",
+          },
+        ],
+      });
+    if (u.pathname.endsWith("horarios"))
+      return route.fulfill({
+        json: options.empty
+          ? []
+          : [
+              {
+                id: "s1",
+                profissionalId: "ana",
+                data: u.searchParams.get("data"),
+                hora: "09:00",
+                disponivel: true,
+              },
+            ],
+      });
+    return route.fulfill({ json: [] });
+  });
+}
+const confirmation = "/confirmar?profissional=ana&horario=s1&data=2030-10-05";
+test("link de confirmação aguarda catálogo; data inválida não quebra a tela", async ({
+  page,
+}) => {
+  let release!: () => void;
+  await fixture(page, { delay: new Promise<void>((r) => (release = r)) });
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto(confirmation);
+  await expect(page.getByRole("status")).toContainText("Carregando resumo");
+  release();
+  await expect(
+    page.getByRole("button", { name: "Confirmar agendamento", exact: true }),
+  ).toBeEnabled();
+  await page.goto(confirmation.replace("2030-10-05", "2030-99-99"));
+  await expect(page.getByRole("alert")).toContainText("Escolha uma data");
+  await expect(
+    page.getByRole("button", { name: "Confirmar agendamento", exact: true }),
+  ).toBeDisabled();
+  expect(errors).toEqual([]);
+});
+test("falha de catálogo é amigável e permite tentar novamente", async ({
+  page,
+}) => {
+  const options = { error: true };
+  await fixture(page, options);
+  await page.goto("/busca");
+  await expect(page.getByRole("alert")).toContainText("Não foi possível");
+  await expect(page.locator("body")).not.toContainText("INTERNAL_STACK_TRACE");
+  options.error = false;
+  await page.getByRole("button", { name: "Tentar novamente" }).click();
+  await expect(page.locator(".doctor-card")).toHaveCount(1);
+});
+test("horários vazios mantêm avanço bloqueado", async ({ page }) => {
+  await fixture(page, { empty: true });
+  await page.goto("/profissional/ana");
+  await expect(
+    page.getByText("Nenhum horário disponível. Escolha outra data."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Avançar para agendamento" }),
+  ).toBeDisabled();
+});
+test("remarcação 409 descarta horário; offline e envio pendente não reenviam", async ({
+  page,
+  context,
+}) => {
+  await fixture(page);
+  let writes = 0;
+  let release!: () => void;
+  const gate = new Promise<void>((r) => (release = r));
+  await page.route("**/api/agendamentos/consulta/reagendar", async (r) => {
+    writes++;
+    await gate;
+    await r.fulfill({ status: 409, json: { detail: "occupied" } });
+  });
+  await page.goto(confirmation + "&remarcar=consulta");
+  const button = page.getByRole("button", {
+    name: "Confirmar remarcação",
+    exact: true,
+  });
+  await expect(button).toBeEnabled();
+  await context.setOffline(true);
+  await expect(button).toBeDisabled();
+  expect(writes).toBe(0);
+  await context.setOffline(false);
+  await button.click();
+  await expect(
+    page.getByRole("button", { name: "Confirmando…" }),
+  ).toBeDisabled();
+  release();
+  await expect(page.getByRole("alert")).toContainText("ocupado");
+  await expect(button).toBeDisabled();
+  expect(writes).toBe(1);
+});
+test("cancelamento com erro mantém consulta e permite recuperar", async ({
+  page,
+}) => {
+  await fixture(page);
+  let cancelled = false,
+    fail = true,
+    deletes = 0;
+  await page.route("**/api/agendamentos**", async (r) => {
+    if (r.request().method() === "DELETE") {
+      deletes++;
+      if (fail)
+        return r.fulfill({
+          status: 500,
+          json: { detail: "INTERNAL_STACK_TRACE" },
+        });
+      cancelled = true;
+      return r.fulfill({ json: {} });
+    }
+    return r.fulfill({
+      json: [
+        {
+          id: "consulta",
+          pacienteId: "paciente-teste",
+          profissionalId: "ana",
+          horarioId: "s1",
+          data: "2030-10-05",
+          hora: "09:00",
+          valor: 180,
+          status: cancelled ? "cancelado" : "agendado",
+        },
+      ],
+    });
+  });
+  await page.goto("/agenda");
+  await page.getByRole("button", { name: "Ver detalhes" }).click();
+  await expect(page.getByRole("dialog")).toContainText("Rua Teste, 10");
+  await page.keyboard.press("Escape");
+  await page
+    .getByRole("button", { name: "Cancelar consulta", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Manter consulta" }).click();
+  expect(deletes).toBe(0);
+  await page
+    .getByRole("button", { name: "Cancelar consulta", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Confirmar cancelamento" }).click();
+  await expect(page.getByRole("dialog")).toContainText("Não foi possível");
+  expect(cancelled).toBe(false);
+  fail = false;
+  await page.getByRole("button", { name: "Confirmar cancelamento" }).click();
+  await page.getByRole("button", { name: /Histórico/ }).click();
+  await expect(page.locator(".appointment")).toContainText("Cancelada");
+});
