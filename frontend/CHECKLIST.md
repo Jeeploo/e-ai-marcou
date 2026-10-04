@@ -8,7 +8,7 @@ A ideia deste documento é mostrar o que ficou pronto, como cada parte funciona 
 
 ## Como ficou a entrega
 
-A parte de frontend da lista foi entregue, com os complementos desta revisão descritos abaixo. As telas, os fluxos, os tratamentos de erro e a PWA estão implementados. O código foi enviado para a branch `frontend`, sem juntar as mudanças com `main` ou `backend`.
+As telas e os fluxos principais de busca e agendamento, os tratamentos de erro e a PWA estão implementados. Isso não significa que todo recurso citado no documento esteja completo: o perfil funciona localmente, algumas configurações aguardam dados da equipe e GPS, login, pagamentos, envio de notificações e publicação não foram feitos. O código foi enviado para a branch `frontend`, sem juntar as mudanças com `main` ou `backend`.
 
 Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu conferir o que a tela envia e como reage a sucesso, erro e horário ocupado. O teste com o servidor e o banco reais ficou separado para o Jefferson continuar.
 
@@ -146,14 +146,14 @@ Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu
 - [x] Buscar endereço pelo CEP — o botão consulta o ViaCEP, preenche os campos e deixa o usuário corrigir o que precisar. Há mensagens para CEP inválido, inexistente, falha de conexão ou demora na resposta. O preenchimento foi testado com uma resposta simulada.
 - [x] Corrigir os últimos detalhes dos fluxos — abrir a confirmação por link agora aguarda o catálogo; uma data inválida não quebra a página; o erro 409 limpa a seleção; o teclado continua dentro da janela aberta; os detalhes mostram os dados disponíveis da clínica.
 
-## O que fica para o Jefferson continuar na integração
+## O que falta na integração e quem participa
 
-As telas e as chamadas já estão prontas. Estes são os passos que faltam para conferir o funcionamento com os dados reais do projeto.
+As chamadas de catálogo, horários e agendamentos estão implementadas. As chamadas para salvar perfil e endereços no servidor ainda não estão implementadas. As tarefas abaixo não são todas exclusivas do Jefferson: configurar o modo API e ajustar o frontend fazem parte da integração do frontend também.
 
 - [ ] Testar o fluxo completo com a API real — carregar o catálogo, buscar horários, agendar, remarcar, cancelar e conferir o histórico. Na última verificação, o FastAPI não estava disponível em 127.0.0.1:8000.
 - [ ] Conferir o banco e a disputa por horários — verificar se cada operação salva corretamente e se duas pessoas tentando a mesma vaga recebem o resultado esperado. O frontend já sabe mostrar a mensagem de horário ocupado.
-- [ ] Ativar o modo API — configurar VITE_DATA_MODE=api, VITE_API_URL e um VITE_PATIENT_ID válido. A configuração padrão ainda usa dados locais, que não são agendamentos reais.
-- [ ] Preparar os dados de teste — deixar o FastAPI acessível, permitir a conexão do frontend pelo CORS e ter paciente, especialidades, clínicas, profissionais e horários cadastrados. As credenciais do banco ficam só no backend.
+- [ ] Frontend/configuração: ativar o modo API — configurar VITE_DATA_MODE=api, VITE_API_URL e um VITE_PATIENT_ID válido. A configuração padrão ainda usa dados locais, que não são agendamentos reais.
+- [ ] Backend: preparar os dados de teste — deixar o FastAPI acessível, permitir a conexão do frontend pelo CORS e ter paciente, especialidades, clínicas, profissionais e horários cadastrados. As credenciais do banco ficam só no backend.
 
 ## O que funciona só em parte ou depende de outro serviço
 
@@ -163,6 +163,18 @@ As telas e as chamadas já estão prontas. Estes são os passos que faltam para 
 - **Suporte:** as perguntas frequentes funcionam e o botão aceita um contato oficial configurado em VITE_SUPPORT_URL (HTTPS ou mailto). Falta a equipe informar esse contato; isso não depende do backend. Sem configuração válida, a orientação de ajuda continua disponível.
 - **Fotos dos profissionais:** o frontend agora mostra a foto recebida em fotoUrl nos cards e no perfil. Se o endereço não for válido ou a imagem falhar, mostra as iniciais. Faltam as fotos oficiais e seus endereços; a exibição já está pronta. O campo pode vir da API, ou as imagens podem ser incluídas no catálogo local quando forem fornecidas.
 - **CEP e mapa:** precisam de internet e dos serviços externos funcionando. Eles não fazem parte do uso offline da PWA.
+
+## Correção sobre o que está concluído
+
+A afirmação anterior de que “100% de tudo que poderia ser feito no frontend” estava concluído foi ampla demais. O status correto é:
+
+- **Implementado:** navegação, busca, horários, confirmação, agenda, chamadas de agendamento, PWA, formulários locais, exibição de fotos recebidas e suporte configurável.
+- **Ainda exige trabalho no frontend:** conectar perfil e endereços às rotas reais quando o contrato estiver disponível. Essa ligação não foi implementada e não é uma tarefa exclusivamente do backend.
+- **Configuração pendente:** ativar o modo API com um paciente válido e preencher o contato oficial de suporte. Não exige refazer os componentes, mas ainda precisa ser configurado.
+- **Informações pendentes da equipe:** fotos e endereços oficiais. O código de exibição está pronto; o conteúdo não foi fornecido.
+- **Não implementado:** GPS e publicação. Podem ser feitos pelo frontend/hospedagem, mas ficaram fora da entrega. Login, pagamento e envio de notificações também ficaram fora do MVP e exigem trabalho conjunto.
+
+Os testes já registrados continuam válidos para os cenários executados. Esta correção esclarece o status; não registra uma nova rodada de testes nem funcionalidades novas.
 
 ## Quem precisa continuar cada parte
 
