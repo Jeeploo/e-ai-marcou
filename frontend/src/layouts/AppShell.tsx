@@ -58,14 +58,14 @@ export default function AppShell() {
         Pular para o conteúdo
       </a>
       <aside className="sidebar">
-        <Link className="brand" to="/" aria-label="e aí, marcou? — Início">
+        <Link className="brand" to="/" aria-label="E aí, marcou? — Início">
           <span className="brand-icon">
             <CalendarDays size={43} />
             <Plus className="brand-plus" size={23} />
             <MapPin className="brand-pin" size={27} />
           </span>
           <span>
-            e aí,<strong>marcou?</strong>
+            E aí,<strong>marcou?</strong>
           </span>
         </Link>
         <nav aria-label="Navegação principal" className="navigation">

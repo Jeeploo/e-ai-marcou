@@ -377,7 +377,13 @@ export function ConfirmPage() {
       </div>
       {success && (
         <Modal
-          title="Tudo certo! Consulta confirmada."
+          title={
+            demoMode
+              ? "Solicitação salva neste dispositivo"
+              : reschedule
+                ? "Consulta remarcada!"
+                : "Tudo certo! Consulta confirmada."
+          }
           onClose={() => navigate("/agenda")}
         >
           <div className="success-content">

@@ -6,7 +6,7 @@
   font-size: 16px;
   line-height: 1.5;
   --green: #123b3a;
-  --orange: #ed5933;
+  --orange: #c9421d;
   --border: #dce4ed;
   --muted: #5e718d;
 }
@@ -92,7 +92,7 @@ p {
 }
 .brand strong {
   display: block;
-  color: #ff693f;
+  color: #ff865f;
   font-size: 1rem;
   margin-top: 4px;
 }
@@ -105,7 +105,7 @@ p {
   position: absolute;
   top: 14px;
   left: 10px;
-  color: #ff693f;
+  color: #ff865f;
   background: var(--green);
 }
 .brand-pin {
@@ -1638,4 +1638,92 @@ dialog::backdrop {
   .profile-content {
     min-height: 420px;
   }
+}
+
+/* Keep the map aligned with the available viewport and readable result cards. */
+@media (min-width: 1151px) {
+  .search-layout.map-open {
+    min-height: calc(100dvh - 80px);
+    align-items: stretch;
+  }
+  .map-open .doctor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    overflow: visible;
+  }
+  .map-open .doctor-grid > div {
+    min-width: 0;
+  }
+  .map-open .demo-map {
+    min-height: 650px;
+  }
+}
+.doctor-grid > div > .doctor-card {
+  height: auto;
+}
+.doctor-grid > div > .button-wide {
+  margin-top: 8px;
+}
+@media (max-width: 760px) {
+  .search-results > .doctor-grid > div {
+    flex: 0 0 88%;
+    min-width: 0;
+    scroll-snap-align: center;
+  }
+}
+/* Map controls remain outside Google's canvas and attribution. */
+.demo-map {
+  background-image: none;
+  display: flex;
+  flex-direction: column;
+}
+.map-disclaimer {
+  position: static;
+  margin: 12px;
+  font-size: 0.875rem;
+}
+.region-map {
+  position: static;
+  display: block;
+  height: 380px;
+  min-height: 300px;
+  flex: 1;
+}
+.map-full-link {
+  position: static;
+  align-self: flex-start;
+  margin: 10px 16px 0;
+  min-height: 44px;
+}
+.map-preview {
+  position: static;
+  width: 100%;
+  max-width: none;
+  padding: 16px;
+  margin: 0;
+}
+@media (min-width: 1151px) {
+  .map-open .demo-map {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100dvh;
+    min-height: 720px;
+  }
+}
+@media (max-width: 760px) {
+  .availability > .primary {
+    position: static;
+    box-shadow: none;
+    margin-top: 24px;
+  }
+  .demo-map {
+    min-height: 700px;
+  }
+}
+
+.map-selection {
+  padding: 0 16px 12px;
+  display: grid;
+  gap: 6px;
 }

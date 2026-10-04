@@ -1,4 +1,5 @@
 import { prototypeExtras } from "../data/features";
+import { lookupPostalCode } from "../services/postal";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -40,6 +41,7 @@ export default function ProfilePage() {
     [patient, setPatient] = useState(profile.patient),
     [message, setMessage] = useState(""),
     [address, setAddress] = useState<Address>(),
+    [postalBusy, setPostalBusy] = useState(false),
     [addressError, setAddressError] = useState(""),
     [support, setSupport] = useState(false);
   const active =
@@ -367,7 +369,40 @@ export default function ProfilePage() {
                 }
               />
             </label>
-            <p className="hint">Preencha seu endereço completo.</p>
+            <button
+              type="button"
+              className="outline"
+              disabled={postalBusy}
+              onClick={async () => {
+                const queried = address.cep;
+                setPostalBusy(true);
+                setAddressError("");
+                try {
+                  const found = await lookupPostalCode(queried);
+                  setAddress((current) =>
+                    current?.cep === queried
+                      ? { ...current, ...found }
+                      : current,
+                  );
+                } catch (error) {
+                  setAddressError(
+                    error instanceof Error &&
+                      error.name !== "TimeoutError" &&
+                      error.name !== "TypeError"
+                      ? error.message
+                      : "Não foi possível buscar o CEP. Preencha manualmente.",
+                  );
+                } finally {
+                  setPostalBusy(false);
+                }
+              }}
+            >
+              {postalBusy ? "Buscando CEP…" : "Buscar CEP"}
+            </button>
+            <p className="hint">
+              Confira o endereço e informe o número. Você também pode preencher
+              manualmente.
+            </p>
             <label>
               Rua / Avenida
               <input

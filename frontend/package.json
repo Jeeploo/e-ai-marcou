@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
     "test:e2e": "playwright test",
-    "format": "prettier --write src tests vite.config.ts playwright.config.ts"
+    "format": "prettier --write src tests vite.config.ts playwright.config.ts",
+    "test:api": "playwright test --config playwright.api.config.ts"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
@@ -21,6 +22,7 @@
     "react-router-dom": "^7.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.0.0",

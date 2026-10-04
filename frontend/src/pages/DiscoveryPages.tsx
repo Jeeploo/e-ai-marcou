@@ -1,12 +1,14 @@
 import { prototypeExtras } from "../data/features";
+import { useOnline } from "../hooks/useOnline";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { List, MapPin, SlidersHorizontal } from "lucide-react";
 import DoctorCard from "../components/DoctorCard";
 import { useCatalog } from "../hooks/CatalogContext";
-import { currency } from "../data/catalog";
+import { professionalDetails } from "../data/catalog";
 import { demoMode } from "../services/api";
 export function SearchPage() {
+  const online = useOnline();
   const { professionals, specialties, loading, error, reload } = useCatalog(),
     [params, setParams] = useSearchParams(),
     [filters, setFilters] = useState(false);
@@ -43,6 +45,10 @@ export function SearchPage() {
     );
   const active =
     results.find((p) => p.id === params.get("destaque")) || results[0];
+  const mapAddress =
+    active?.address ||
+    (demoMode && active ? professionalDetails[active.id]?.address : "") ||
+    "São Paulo, SP";
   return (
     <>
       <header className="page-header">
@@ -127,7 +133,18 @@ export function SearchPage() {
               </p>
               <div className="doctor-grid">
                 {results.map((doctor) => (
-                  <DoctorCard key={doctor.id} doctor={doctor} />
+                  <div key={doctor.id}>
+                    <DoctorCard doctor={doctor} />
+                    {map && (
+                      <button
+                        className="outline button-wide"
+                        aria-pressed={active?.id === doctor.id}
+                        onClick={() => update("destaque", doctor.id)}
+                      >
+                        Mostrar no mapa
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
               {!results.length && (
@@ -141,7 +158,7 @@ export function SearchPage() {
               )}
             </>
           )}
-          {prototypeExtras && demoMode && (
+          {prototypeExtras && (
             <button
               className="map-toggle"
               onClick={() => update("visualizacao", map ? "" : "mapa")}
@@ -151,23 +168,44 @@ export function SearchPage() {
             </button>
           )}
         </div>
-        {prototypeExtras && demoMode && map && (
+        {prototypeExtras && map && (
           <section
             className="demo-map"
-            aria-label="Mapa de referência de São Paulo"
+            aria-label="Localização da clínica no Google Maps"
           >
             <p className="map-disclaimer">
-              Região de referência · consulte o endereço da clínica
+              Google Maps · confira o endereço antes de sair
             </p>
-            <iframe
-              title="Mapa da região de São Paulo"
-              className="region-map"
-              loading="lazy"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=-46.6800%2C-23.5750%2C-46.6350%2C-23.5450&layer=mapnik"
-            />
+            <label className="map-selection">
+              Profissional no mapa
+              <select
+                value={active?.id || ""}
+                onChange={(e) => update("destaque", e.target.value)}
+              >
+                {results.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} · {p.clinic}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {!online && (
+              <p role="status" className="error-message">
+                O mapa precisa de internet. Reconecte-se para consultar a
+                localização.
+              </p>
+            )}
+            {online && (
+              <iframe
+                title="Google Maps: localização da clínica"
+                className="region-map"
+                loading="lazy"
+                src={`https://www.google.com/maps?q=${encodeURIComponent(mapAddress)}&output=embed`}
+              />
+            )}
             <a
               className="map-full-link"
-              href="https://www.openstreetmap.org/#map=14/-23.5600/-46.6575"
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapAddress)}`}
               target="_blank"
               rel="noreferrer"
             >
@@ -180,7 +218,7 @@ export function SearchPage() {
                   className="outline button-wide"
                   target="_blank"
                   rel="noreferrer"
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(active.address || active.clinic + ", São Paulo")}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapAddress)}`}
                 >
                   Consultar endereço no mapa
                 </a>
