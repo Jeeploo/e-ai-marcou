@@ -1,6 +1,7 @@
 import { professionals } from "../data/catalog";
 import type { Appointment, Slot } from "../types/models";
-export const demoMode = import.meta.env.VITE_DATA_MODE !== "api";
+export const demoMode =
+  import.meta.env.MODE !== "api" && import.meta.env.VITE_DATA_MODE !== "api";
 export const patientId = import.meta.env.VITE_PATIENT_ID || "paciente-demo";
 const base = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(
   /\/$/,

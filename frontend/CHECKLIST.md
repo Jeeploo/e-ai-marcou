@@ -2,7 +2,7 @@
 
 Revisão do projeto: 04/10/2026. Trabalho feito na branch `frontend`.
 
-A ideia deste documento é mostrar o que ficou pronto, como cada parte funciona e o que o Jefferson precisa continuar na integração. Esta versão só muda a forma de explicar; os resultados são dos testes que já foram feitos.
+Este documento separa o frontend implementado, as dependências do backend e as informações que a equipe ainda precisa fornecer. Um item marcado descreve a parte feita e o tipo de teste realizado; não significa que o backend real foi validado.
 
 **Como ler a lista:** os itens com `[x]` foram feitos ou testados no frontend, como explicado ao lado. Os itens com `[ ]` ainda precisam ser concluídos. As partes que funcionam só no navegador e as dependências do backend estão separadas mais abaixo.
 
@@ -10,7 +10,7 @@ A ideia deste documento é mostrar o que ficou pronto, como cada parte funciona 
 
 As telas e os fluxos principais de busca e agendamento, os tratamentos de erro e a PWA estão implementados. Isso não significa que todo recurso citado no documento esteja completo: o perfil funciona localmente, algumas configurações aguardam dados da equipe e GPS, login, pagamentos, envio de notificações e publicação não foram feitos. O código foi enviado para a branch `frontend`, sem juntar as mudanças com `main` ou `backend`.
 
-Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu conferir o que a tela envia e como reage a sucesso, erro e horário ocupado. O teste com o servidor e o banco reais ficou separado para o Jefferson continuar.
+Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu conferir o que a tela envia e como reage a sucesso, erro e horário ocupado. Backend: o servidor, os dados de teste e o banco precisam estar disponíveis para a validação real. Essa validação é conjunta: qualquer incompatibilidade nas chamadas ou nas telas continua sendo responsabilidade do frontend.
 
 ## Estrutura, visual e facilidade de uso
 
@@ -68,7 +68,7 @@ Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu
 - [x] Centralizar as chamadas — catálogo, horários e agendamentos ficam em src/services/api.ts.
 - [x] Evitar fetch espalhado — as telas chamam os serviços. A busca de CEP fica separada em src/services/postal.ts.
 - [x] Configurar VITE_API_URL — o endereço da API pode ser definido pela configuração de ambiente, sem colocar credenciais no código.
-- [x] Usar 127.0.0.1:8000 no desenvolvimento — esse é o endereço padrão. Para usar o servidor, é preciso ativar VITE_DATA_MODE=api.
+- [x] Usar 127.0.0.1:8000 no desenvolvimento — esse é o endereço padrão. Para iniciar diretamente com o backend, use npm run dev:api. Esse comando ativa a API mesmo se a configuração local estiver em modo demo.
 - [x] Consumir /api/especialidades — a chamada busca os nomes e identificadores das especialidades.
 - [x] Consumir /api/clinicas — a chamada busca os dados das clínicas, incluindo endereço, cidade e estado.
 - [x] Consumir /api/profissionais — a chamada busca os profissionais ativos e os valores das consultas.
@@ -146,115 +146,82 @@ Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu
 - [x] Buscar endereço pelo CEP — o botão consulta o ViaCEP, preenche os campos e deixa o usuário corrigir o que precisar. Há mensagens para CEP inválido, inexistente, falha de conexão ou demora na resposta. O preenchimento foi testado com uma resposta simulada.
 - [x] Corrigir os últimos detalhes dos fluxos — abrir a confirmação por link agora aguarda o catálogo; uma data inválida não quebra a página; o erro 409 limpa a seleção; o teclado continua dentro da janela aberta; os detalhes mostram os dados disponíveis da clínica.
 
-## O que falta na integração e quem participa
+## Frontend concluído dentro do escopo combinado
 
-As chamadas de catálogo, horários e agendamentos estão implementadas. As chamadas para salvar perfil e endereços no servidor ainda não estão implementadas. As tarefas abaixo não são todas exclusivas do Jefferson: configurar o modo API e ajustar o frontend fazem parte da integração do frontend também.
+Além das telas e dos fluxos listados acima:
 
-- [ ] Testar o fluxo completo com a API real — carregar o catálogo, buscar horários, agendar, remarcar, cancelar e conferir o histórico. Na última verificação, o FastAPI não estava disponível em 127.0.0.1:8000.
-- [ ] Conferir o banco e a disputa por horários — verificar se cada operação salva corretamente e se duas pessoas tentando a mesma vaga recebem o resultado esperado. O frontend já sabe mostrar a mensagem de horário ocupado.
-- [ ] Frontend/configuração: ativar o modo API — configurar VITE_DATA_MODE=api, VITE_API_URL e um VITE_PATIENT_ID válido. A configuração padrão ainda usa dados locais, que não são agendamentos reais.
-- [ ] Backend: preparar os dados de teste — deixar o FastAPI acessível, permitir a conexão do frontend pelo CORS e ter paciente, especialidades, clínicas, profissionais e horários cadastrados. As credenciais do banco ficam só no backend.
+- [x] Endereços: criar, editar, excluir com confirmação e consultar CEP. Há validação de campos vazios e estado brasileiro.
+- [x] Fotos: mostrar fotoUrl nos cards e no perfil; usar iniciais quando não houver foto ou a imagem falhar.
+- [x] Suporte: perguntas frequentes e contato externo configurável por VITE_SUPPORT_URL, com HTTPS ou e-mail. Não foi inventado um contato da equipe.
+- [x] Google Maps: mostrar o endereço do profissional selecionado e permitir abrir o mapa externamente. CEP e mapa precisam de internet, pois usam serviços externos; isso não é uma falha do backend.
+- [x] Perfil: formulários de dados pessoais, preferências e endereços funcionam na sessão do navegador. A integração de perfil com o backend não está incluída neste item.
+- [x] Remover convênios e planos de saúde da interface.
+- [x] Facilitar o uso com o backend: npm run dev:api inicia o frontend usando as chamadas reais. npm run build:api gera a versão para a API. Ambos evitam manter dados locais por engano ao escolher esse modo.
 
-## O que funciona só em parte ou depende de outro serviço
+## Dependências do backend e trabalho de frontend que depende delas
 
-- **Dados pessoais e endereços:** os formulários funcionam; endereços podem ser criados, editados e excluídos com confirmação. Campos obrigatórios não aceitam só espaços, e a sigla do estado é conferida. Os dados ainda ficam na sessão do navegador, em sessionStorage. Ainda não sincronizam com uma conta ou outro dispositivo. Para isso, precisam das rotas do backend e de um acordo sobre os dados enviados.
-- **Mapa:** usa o endereço que estiver cadastrado. Se houver apenas “São Paulo/SP”, mostra a região. Para apontar o local certo, precisa do endereço completo. Não calcula distância real nem mostra vários marcadores sincronizados.
-- **Preferências de notificações:** as escolhas são salvas localmente. Nenhuma mensagem é enviada, como combinado para o MVP.
-- **Suporte:** as perguntas frequentes funcionam e o botão aceita um contato oficial configurado em VITE_SUPPORT_URL (HTTPS ou mailto). Falta a equipe informar esse contato; isso não depende do backend. Sem configuração válida, a orientação de ajuda continua disponível.
-- **Fotos dos profissionais:** o frontend agora mostra a foto recebida em fotoUrl nos cards e no perfil. Se o endereço não for válido ou a imagem falhar, mostra as iniciais. Faltam as fotos oficiais e seus endereços; a exibição já está pronta. O campo pode vir da API, ou as imagens podem ser incluídas no catálogo local quando forem fornecidas.
-- **CEP e mapa:** precisam de internet e dos serviços externos funcionando. Eles não fazem parte do uso offline da PWA.
+### Catálogo, horários e agendamentos
 
-## Correção sobre o que está concluído
+**Frontend:** as chamadas das cinco rotas estão implementadas, incluindo criação, remarcação, cancelamento, carregamento, erro, resposta 409 e bloqueio sem internet. Os testes interceptam as chamadas e verificam os dados enviados e a reação das telas.
 
-A afirmação anterior de que “100% de tudo que poderia ser feito no frontend” estava concluído foi ampla demais. O status correto é:
+**Backend — Jefferson:** disponibilizar o FastAPI, configurar CORS e Firestore e fornecer dados de teste válidos, incluindo paciente e horários. O backend é responsável por salvar as operações, validar preços e impedir duas reservas da mesma vaga.
 
-- **Implementado:** navegação, busca, horários, confirmação, agenda, chamadas de agendamento, PWA, formulários locais, exibição de fotos recebidas e suporte configurável.
-- **Ainda exige trabalho no frontend:** conectar perfil e endereços às rotas reais quando o contrato estiver disponível. Essa ligação não foi implementada e não é uma tarefa exclusivamente do backend.
-- **Configuração pendente:** ativar o modo API com um paciente válido e preencher o contato oficial de suporte. Não exige refazer os componentes, mas ainda precisa ser configurado.
-- **Informações pendentes da equipe:** fotos e endereços oficiais. O código de exibição está pronto; o conteúdo não foi fornecido.
-- **Não implementado:** GPS e publicação. Podem ser feitos pelo frontend/hospedagem, mas ficaram fora da entrega. Login, pagamento e envio de notificações também ficaram fora do MVP e exigem trabalho conjunto.
+- [ ] Validação conjunta com o backend real. Não é necessário criar novamente as telas. Se o contrato real tiver diferenças, o ajuste das chamadas continuará sendo uma tarefa de frontend; não deve ser repassado ao backend como se fosse exclusivamente dele.
 
-Os testes já registrados continuam válidos para os cenários executados. Esta correção esclarece o status; não registra uma nova rodada de testes nem funcionalidades novas.
+### Dados pessoais e endereços sincronizados
 
-## Quem precisa continuar cada parte
+**Frontend:** formulários e gerenciamento local estão prontos. Os dados ficam em sessionStorage e não acompanham uma conta em outro dispositivo.
 
-| Parte | O que já dá para usar | O que falta e de quem depende |
+**Backend — Jefferson:** definir e disponibilizar as rotas de consulta e alteração dos dados pessoais e endereços, com os campos aceitos e a identificação do paciente. Essas rotas não aparecem na versão da branch backend consultada nesta revisão.
+
+- [ ] Frontend dependente do backend: depois de existir esse contrato, conectar os formulários às rotas e testar carregamento, gravação e falhas. Essas chamadas ainda não foram implementadas. Inventar rotas agora não produziria uma integração funcionando.
+
+### Fotos e endereços das clínicas
+
+**Frontend:** exibe as fotos e os endereços recebidos. O mapa usa o endereço disponível; se vier apenas a cidade, mostra a região.
+
+**Backend — Jefferson:** devolver fotoUrl e os endereços completos no catálogo real. A equipe precisa fornecer fotos e endereços oficiais. Não falta criar o componente de imagem ou a tela do mapa.
+
+## Configuração e publicação: não são pendências exclusivas do backend
+
+- [ ] Equipe: informar um contato oficial de suporte. Depois basta preencher VITE_SUPPORT_URL e gerar o build. Isso não precisa de backend.
+- [ ] Backend — Jefferson: informar um paciente de teste válido e o endereço da API. O frontend já aceita VITE_PATIENT_ID e VITE_API_URL; o endereço local padrão é http://127.0.0.1:8000. O identificador provisório não é um sistema de autenticação.
+- [ ] Equipe/hospedagem: definir onde publicar e qual endereço usar. O build e as instruções estão prontos em PUBLICACAO.md, mas não foi publicado um site. Publicar arquivos estáticos é uma tarefa de frontend/hospedagem, não do backend.
+- [ ] Backend — Jefferson: para usar consultas reais no site publicado, disponibilizar a API por HTTPS e liberar o domínio no CORS. Depois da publicação, o frontend precisa ser conferido no endereço definitivo.
+
+## Recursos fora do MVP, sem marcar como tarefas concluídas
+
+Estes recursos foram excluídos na lista original. Não são falhas no fluxo de agendamento nem tarefas que possam ser dadas como prontas apenas por desenhar uma tela.
+
+| Recurso | Frontend | Backend e outras dependências |
 |---|---|---|
-| Dados pessoais e endereços | Formulários e gerenciamento local de endereços. | Backend: rotas para salvar e consultar dados vinculados ao paciente. Depois, frontend: conectar essas rotas. Não é possível sincronizar contas só com o navegador. |
-| Fotos | Exibição de fotoUrl e iniciais quando a imagem falha. | Equipe: fornecer fotos oficiais ou URLs. Backend: devolver fotoUrl se o catálogo for gerenciado pela API. Não falta construir a exibição. |
-| Suporte | Link externo configurável e perguntas frequentes. | Equipe: informar o contato. Frontend/configuração: preencher VITE_SUPPORT_URL e gerar novo build. Não precisa de backend. |
-| Endereço no mapa | Google Maps usando o endereço disponível. | Equipe: informar endereços completos. Backend: entregá-los no catálogo real. Não é preciso criar outra tela. |
-| Login e autorização | Não implementados, conforme o MVP. | É trabalho conjunto: backend/provedor autentica, controla sessão e permissões; frontend apresenta login e usa a sessão. Uma tela de login sozinha não protege dados. |
-| Pagamento | Não há cobrança; há apenas preferência visual no modo local. | É trabalho conjunto: escolher provedor e regras; backend cria e valida cobranças e recebe confirmações; frontend apresenta o checkout. Não colocar chaves secretas no navegador. |
-| Envio de notificações | Preferências locais. | Backend/provedor: agendar e enviar SMS, WhatsApp, e-mail ou push. Frontend: conectar preferências e, no caso de push, pedir permissão e registrar a inscrição. Não é só um botão ou uma alteração no Service Worker. |
-| GPS | Não implementado; mapa por endereço continua funcionando. | Pode ser feito no frontend com permissão do usuário e HTTPS. Não é uma obrigação do backend. Não foi acrescentado porque a localização do dispositivo continuou fora do escopo. Distâncias reais também precisam das coordenadas das clínicas. |
-| Outro backend | Nenhum foi criado. | Não é uma pendência: devemos usar o FastAPI do projeto. |
-| Publicar o site | Build pronto e instruções em PUBLICACAO.md. | Frontend/hospedagem: escolher o serviço e configurar o endereço público. Não depende de outro backend para publicar a interface. Para consultas reais, a API também precisa estar acessível por HTTPS, com CORS configurado pelo responsável pelo backend. |
+| Login e autorização | Não há login. Encerrar a sessão local não autentica ninguém. Se entrar no escopo, será preciso criar e conectar a interface de login. | Backend: autenticação, sessão e permissões, ou integração com um provedor definido pela equipe. |
+| Pagamento | Não há processamento financeiro. A escolha visual local não cobra. Um checkout real exigiria integração de frontend. | Backend: criar e validar cobranças e receber confirmações do provedor. Equipe: escolher o serviço e as regras. |
+| Envio de notificações | Preferências locais, sem envio. Se entrar no escopo, conectar preferências; push também requer permissão e inscrição no frontend. | Backend: guardar preferências e inscrições, programar e enviar mensagens por um provedor. O Service Worker atual cuida do cache, não envia lembretes. |
+| GPS e distância real | GPS não foi implementado. Pode ser feito no frontend com permissão do usuário; não é obrigação do backend. O pedido posterior de Google Maps foi atendido por endereço. | Backend: fornecer coordenadas das clínicas se houver comparação por distância. Não se deve apresentar as distâncias locais de exemplo como distâncias reais. |
+| Outro backend | Não deve ser criado pelo frontend. | Backend: manter o FastAPI existente e o acesso ao Firestore. Não é uma pendência de implementação do frontend. |
 
-## O que ficou fora do MVP
+## Testes e limites da confirmação
 
-Login, cobrança, envio de notificações e GPS continuam sem implementação completa. Eles não foram marcados como concluídos nem como tarefas exclusivas do Jefferson: a tabela explica onde há participação do frontend, do backend ou da equipe.
+Os testes anteriores cobriram busca, navegação, horários, agendamento, remarcação, cancelamento, conflitos, estados vazios, erros, teclado, responsividade e acessibilidade automática. Foram verificadas larguras de 320 a 1440px. Os testes com respostas simuladas confirmam o comportamento do frontend; não comprovam persistência no backend.
 
-Não foi publicada uma versão pública nesta revisão. Ainda é preciso definir a hospedagem e o ambiente que será exposto. O envio para o GitHub guarda o código, mas não cria um site público.
+A instalação real no Edge, abertura em janela de aplicativo e recarga offline foram verificadas anteriormente com um perfil temporário. O aplicativo de teste foi removido ao terminar. Não foi feito teste em celular físico, conforme o combinado.
 
-## Complementos feitos nesta revisão
+Nesta revisão, a execução do modo API foi ajustada para usar o comando dev:api nos testes, inclusive com VITE_DATA_MODE=demo no ambiente, para verificar que o comando realmente usa a API. Resultado desta rodada: os 7 testes de API passaram. Os builds normal e API também passaram, incluindo a verificação de TypeScript. Os testes de layout e instalação anteriores não foram repetidos porque esta alteração não mudou as telas nem o Service Worker.
 
-- [x] Excluir endereço com confirmação e opção de desistir.
-- [x] Manter edição de endereço e conferir o resultado após salvar.
-- [x] Rejeitar campos de endereço preenchidos só com espaços e siglas de estado inválidas.
-- [x] Mostrar fotos recebidas em fotoUrl nos cards e na página do profissional.
-- [x] Voltar às iniciais se a foto estiver ausente, for inválida ou não carregar.
-- [x] Permitir configurar o contato de suporte sem alterar os componentes.
-- [x] Separar no checklist tarefas de backend, frontend, hospedagem e informações da equipe.
-- [x] Documentar como preparar a publicação, sem publicar um ambiente com dados locais por engano.
+## Como executar
 
-## Resultado dos testes já feitos
+Dentro de frontend:
 
-- O build de TypeScript e Vite passou.
-- Na revisão final, passaram 16 testes de fluxos e acessibilidade, incluindo teclado e janelas de confirmação.
-- Os três testes anteriores de CEP, mapa e inspeção também passaram na revisão em que foram executados. Não foram repetidos sem uma mudança que justificasse isso.
-- Na revisão anterior, passaram 6 testes de comunicação e erros: criação, remarcação com 409, cancelamento com falha e nova tentativa, catálogo com falha, horários vazios, falta de internet, bloqueio durante envio e confirmação aberta por link.
-- A checagem automática Axe, com regras WCAG A/AA, não encontrou violações nas sete telas avaliadas em duas larguras.
-- A instalação no Edge, a abertura em janela independente e a recarga offline passaram. Ao terminar, o aplicativo criado no perfil de teste foi removido.
-- O teste com a API real ficou pendente porque a porta 8000 não estava disponível na última verificação.
+- npm install: instalar dependências.
+- npm run dev: executar com a configuração local existente.
+- npm run dev:api: executar com o backend; o FastAPI deve estar disponível.
+- npm run build: gerar a versão com a configuração local.
+- npm run build:api: gerar a versão que usa o backend.
+- npm run preview: abrir a versão compilada e verificar a PWA.
+- npm run test:e2e: testes de interface.
+- npm run test:api: testes das chamadas e erros com respostas simuladas.
 
-## Como abrir e conferir
+VITE_API_URL, VITE_PATIENT_ID e VITE_SUPPORT_URL são configurações públicas. Nenhuma senha ou credencial do Firebase deve ser colocada nelas ou enviada ao GitHub.
 
-Dentro da pasta frontend, os comandos são:
-
-- `npm install` para instalar as dependências.
-- `npm run dev` para abrir a versão de desenvolvimento.
-- `npm run build` para gerar a versão compilada.
-- `npm run preview` para visualizar essa versão e conferir a PWA.
-- `npm run test:e2e` para executar os testes de interface.
-- `npm run test:api` para executar os testes com respostas simuladas da API.
-
-O terminal informa o endereço para abrir no navegador. O Service Worker funciona na versão compilada.
-
-Para testar a instalação, deixe a prévia rodando em http://127.0.0.1:4173 e execute `node tests/pwa-install.cjs` dentro de frontend. Ele usa um perfil temporário do Edge, instala a PWA, abre como aplicativo, recarrega offline e remove somente o aplicativo criado nesse teste.
-
-Para ligar aos dados reais, configure `VITE_DATA_MODE=api`, `VITE_API_URL=http://127.0.0.1:8000` e um `VITE_PATIENT_ID` válido. Depois, reinicie o Vite com o FastAPI e os dados de teste disponíveis. Nenhuma credencial Firebase deve ir para o frontend.
-
-## Onde ficaram as principais mudanças
-
-Os caminhos abaixo partem da pasta frontend:
-
-- Busca e mapa: src/pages/DiscoveryPages.tsx.
-- Marca: src/layouts/AppShell.tsx, index.html e public/manifest.webmanifest.
-- Layout e contraste: src/index.css.
-- CEP e perfil: src/services/postal.ts e src/pages/ProfilePage.tsx.
-- Confirmação e agenda: src/pages/BookingPages.tsx e src/pages/AgendaPage.tsx.
-- Janelas e navegação por teclado: src/components/Modal.tsx.
-- Testes: tests/accessibility.spec.ts, tests/flows.spec.ts, tests/review.spec.ts, tests/api.spec.ts e tests/pwa-install.cjs.
-- Configuração dos testes: playwright.config.ts e playwright.api.config.ts.
-- Dependências: package.json e package-lock.json.
-- Checklist do projeto: CHECKLIST.md, com o que foi feito, os testes e as partes que precisam de continuidade na integração.
-
-## Testes dos complementos
-
-- Build aprovado após os novos componentes.
-- 16 testes de fluxos e acessibilidade passaram novamente nas telas afetadas. Somando o teste de endereços e os 7 testes de API, foram 24 testes aprovados nesta revisão.
-- 1 teste novo de endereços aprovado: validação, edição, desistência, exclusão, recarga e acessibilidade da confirmação.
-- 7 testes de API aprovados nesta revisão, incluindo o novo cenário de foto carregada, falha com retorno às iniciais e contato de suporte configurado. Os testes usam respostas simuladas.
-
-As melhorias de endereço continuam locais até existir a integração de perfil. Nenhum contato, foto ou endereço oficial foi inventado.
+O código e este checklist ficam na branch frontend. Nenhum merge com main ou backend faz parte desta entrega.
