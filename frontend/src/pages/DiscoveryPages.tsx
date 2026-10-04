@@ -154,33 +154,36 @@ export function SearchPage() {
         {prototypeExtras && demoMode && map && (
           <section
             className="demo-map"
-            aria-label="Mapa ilustrativo de São Paulo"
+            aria-label="Mapa de referência de São Paulo"
           >
             <p className="map-disclaimer">
-              Mapa ilustrativo · posições fictícias
+              Região de referência · consulte o endereço da clínica
             </p>
-            <div className="map-street street-one" />
-            <div className="map-street street-two" />
-            <span className="street-label">Av. Paulista</span>
-            <span className="street-label second">R. Augusta</span>
-            {results.map((doctor, index) => (
-              <button
-                key={doctor.id}
-                aria-label={`Selecionar ${doctor.name}, ${currency(doctor.price)}`}
-                aria-pressed={active?.id === doctor.id}
-                className="map-marker"
-                style={{
-                  left: `${15 + ((index * 23) % 65)}%`,
-                  top: `${12 + ((index * 17) % 45)}%`,
-                }}
-                onClick={() => update("destaque", doctor.id)}
-              >
-                {currency(doctor.price)}
-              </button>
-            ))}
+            <iframe
+              title="Mapa da região de São Paulo"
+              className="region-map"
+              loading="lazy"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-46.6800%2C-23.5750%2C-46.6350%2C-23.5450&layer=mapnik"
+            />
+            <a
+              className="map-full-link"
+              href="https://www.openstreetmap.org/#map=14/-23.5600/-46.6575"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ampliar mapa
+            </a>
             {active && (
               <div className="map-preview">
                 <DoctorCard doctor={active} />
+                <a
+                  className="outline button-wide"
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(active.address || active.clinic + ", São Paulo")}`}
+                >
+                  Consultar endereço no mapa
+                </a>
               </div>
             )}
           </section>

@@ -61,7 +61,7 @@ export default function ProfilePage() {
       ],
     });
     setAddress(undefined);
-    setMessage("Endereço salvo nesta sessão de demonstração.");
+    setMessage("Endereço salvo.");
   }
   return (
     <>
@@ -122,16 +122,13 @@ export default function ProfilePage() {
               <p>
                 Mantenha seus dados atualizados para agilizar seus agendamentos.
               </p>
-              <p className="hint">
-                Demonstração: use dados fictícios. As alterações ficam apenas
-                nesta sessão.
-              </p>
+
               <form
                 className="profile-form"
                 onSubmit={(e) => {
                   e.preventDefault();
                   save({ ...profile, patient });
-                  setMessage("Dados salvos nesta sessão de demonstração.");
+                  setMessage("Dados salvos.");
                 }}
               >
                 <label>
@@ -165,7 +162,7 @@ export default function ProfilePage() {
                     inputMode="numeric"
                     maxLength={14}
                     pattern="[0-9.\-]{11,14}"
-                    placeholder="Somente dados fictícios"
+                    placeholder="000.000.000-00"
                     value={patient.cpf}
                     onChange={(e) =>
                       setPatient({ ...patient, cpf: e.target.value })
@@ -206,7 +203,8 @@ export default function ProfilePage() {
               <h2>Preferências de notificação</h2>
               <p>Escolha como você prefere receber lembretes e novidades.</p>
               <p className="hint">
-                Preferências demonstrativas. Nenhuma mensagem será enviada.
+                Preferências salvas neste dispositivo. O envio de avisos ainda
+                não está disponível.
               </p>
               {Object.entries(profile.notifications).map(([name, enabled]) => (
                 <div className="notification-row" key={name}>
@@ -313,7 +311,7 @@ export default function ProfilePage() {
                   ],
                   [
                     "Como pedir reembolso?",
-                    "Esta demonstração não realiza cobranças. Para uma consulta real, consulte as condições da clínica e do meio de pagamento.",
+                    "Consulte as condições de cancelamento e reembolso diretamente com a clínica.",
                   ],
                   [
                     "Posso remarcar meu horário?",
@@ -339,15 +337,12 @@ export default function ProfilePage() {
             <>
               <LogOut className="section-icon" />
               <h2>Sair da conta</h2>
-              <p>
-                Você está usando uma sessão demonstrativa, sem autenticação
-                real.
-              </p>
+              <p>Encerre a sessão e volte ao início quando quiser.</p>
               <button
                 className="primary"
                 onClick={() => save({ ...profile, signedOut: true })}
               >
-                Sair da demonstração
+                Sair da conta
               </button>
             </>
           )}
@@ -372,10 +367,7 @@ export default function ProfilePage() {
                 }
               />
             </label>
-            <p className="hint">
-              Preencha o endereço manualmente. A consulta de CEP não está
-              conectada nesta demonstração.
-            </p>
+            <p className="hint">Preencha seu endereço completo.</p>
             <label>
               Rua / Avenida
               <input

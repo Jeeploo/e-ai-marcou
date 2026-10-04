@@ -42,13 +42,13 @@ export default function AppShell() {
   if (profile.signedOut)
     return (
       <div className="signed-out">
-        <h1>Você saiu da demonstração</h1>
-        <p>Não há uma conta autenticada nesta versão.</p>
+        <h1>Você encerrou a sessão</h1>
+        <p>Você pode voltar ao início quando quiser.</p>
         <button
           className="primary"
           onClick={() => save({ ...profile, signedOut: false })}
         >
-          Voltar à demonstração
+          Voltar ao início
         </button>
       </div>
     );
@@ -97,17 +97,11 @@ export default function AppShell() {
           </span>
           <div>
             <strong>{profile.patient.nome}</strong>
-            <span>Paciente{demoMode ? " · demonstração" : ""}</span>
+            <span>Paciente</span>
           </div>
         </div>
       </aside>
       <main id="main-content" tabIndex={-1}>
-        {demoMode && (
-          <div className="demo-notice">
-            Demonstração · dados fictícios e agendamentos locais, sem reserva
-            real.
-          </div>
-        )}
         {!online && (
           <div className="offline-notice" role="status">
             <WifiOff size={18} />

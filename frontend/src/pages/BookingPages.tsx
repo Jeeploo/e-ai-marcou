@@ -325,7 +325,8 @@ export function ConfirmPage() {
               <fieldset className="payment-options">
                 <legend>Como prefere pagar?</legend>
                 <p className="hint">
-                  Seleção demonstrativa. Nenhum pagamento será realizado.
+                  Escolha sua preferência. O pagamento deverá ser combinado com
+                  a clínica.
                 </p>
                 <div>
                   {["Pix", "Cartão de crédito", "Pagar na clínica"].map(
@@ -385,7 +386,7 @@ export function ConfirmPage() {
             </div>
             <p>
               {demoMode
-                ? "Agendamento demonstrativo salvo neste navegador."
+                ? "Solicitação salva neste dispositivo. A confirmação com a clínica ainda é necessária."
                 : "Seu agendamento foi registrado."}
             </p>
             <div className="success-summary">

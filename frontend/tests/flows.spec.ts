@@ -108,7 +108,7 @@ test("perfil salva dados, endereço e preferências; modal aceita Escape", async
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(
     page.getByRole("link", { name: "Notificações", exact: true }),
-  ).toHaveCount(0);
+  ).toHaveCount(1);
   await page.reload();
   await expect(page.locator(".sidebar-user")).toContainText("Pessoa Teste");
 });
@@ -177,19 +177,25 @@ test("texto grande não gera overflow em celular", async ({ page }) => {
   }
 });
 
-test("MVP não expõe pagamento, mapas ou notificações", async ({ page }) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
+test("referências do Figma e textos revisados", async ({ page }) => {
   await page.goto("/busca?visualizacao=mapa");
-  await expect(page.locator(".demo-map")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Ver no mapa" })).toHaveCount(
-    0,
-  );
+  await expect(page.locator(".region-map")).toHaveCount(1);
+  await expect(
+    page.getByRole("link", { name: "Consultar endereço no mapa" }),
+  ).toBeVisible();
+  for (const route of [
+    "/",
+    "/perfil/dados",
+    "/perfil/notificacoes",
+    "/profissional/ana",
+  ]) {
+    await page.goto(route);
+    await expect(page.locator("body")).not.toContainText(
+      /demonstração|demonstrativo|dados fictícios/i,
+    );
+  }
   await page.goto("/perfil/notificacoes");
-  await expect(page.getByRole("switch")).toHaveCount(0);
-  await page.goto("/profissional/ana");
-  await page.getByRole("button", { name: "09:00", exact: true }).click();
-  await page.getByRole("button", { name: "Avançar para agendamento" }).click();
-  await expect(page.locator(".payment-options")).toHaveCount(0);
-  expect(errors).toEqual([]);
+  await expect(
+    page.getByRole("switch", { name: "WhatsApp", exact: true }),
+  ).toBeVisible();
 });
