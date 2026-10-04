@@ -1,3 +1,4 @@
+import ProfessionalAvatar from "../components/ProfessionalAvatar";
 import { prototypeExtras } from "../data/features";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Check, MapPin } from "lucide-react";
@@ -108,9 +109,7 @@ export function ProfessionalPage() {
       </header>
       <div className="page-content professional-layout">
         <section>
-          <div className="avatar portrait" aria-hidden="true">
-            {doctor.initials}
-          </div>
+          <ProfessionalAvatar doctor={doctor} portrait />
           <h2>{doctor.name}</h2>
           <p className="professional-specialty">{doctor.specialty}</p>
           <p>{doctor.crm || details?.crm || "Consulte o CRM com a clínica"}</p>

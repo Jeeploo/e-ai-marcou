@@ -1727,3 +1727,13 @@ dialog::backdrop {
   display: grid;
   gap: 6px;
 }
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+.address-card > button + button {
+  margin-left: 16px;
+}

@@ -1,3 +1,4 @@
+import { supportUrl } from "../services/support";
 import { prototypeExtras } from "../data/features";
 import { lookupPostalCode } from "../services/postal";
 import { useState } from "react";
@@ -41,6 +42,7 @@ export default function ProfilePage() {
     [patient, setPatient] = useState(profile.patient),
     [message, setMessage] = useState(""),
     [address, setAddress] = useState<Address>(),
+    [removeAddress, setRemoveAddress] = useState<Address>(),
     [postalBusy, setPostalBusy] = useState(false),
     [addressError, setAddressError] = useState(""),
     [support, setSupport] = useState(false);
@@ -55,11 +57,36 @@ export default function ProfilePage() {
       setAddressError("Informe um CEP com 8 números.");
       return;
     }
+    if (
+      ![address.rua, address.numero, address.bairro, address.cidade].every(
+        (value) => value.trim(),
+      )
+    ) {
+      setAddressError("Preencha rua, número, bairro e cidade.");
+      return;
+    }
+    if (
+      !"AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO"
+        .split(" ")
+        .includes(address.uf.toUpperCase())
+    ) {
+      setAddressError("Informe uma sigla de estado válida, como SP ou CE.");
+      return;
+    }
     save({
       ...profile,
       addresses: [
         ...profile.addresses.filter((a) => a.id !== address.id),
-        { ...address, id: address.id || crypto.randomUUID() },
+        {
+          ...address,
+          rua: address.rua.trim(),
+          numero: address.numero.trim(),
+          bairro: address.bairro.trim(),
+          cidade: address.cidade.trim(),
+          complemento: address.complemento.trim(),
+          uf: address.uf.toUpperCase(),
+          id: address.id || crypto.randomUUID(),
+        },
       ],
     });
     setAddress(undefined);
@@ -269,6 +296,12 @@ export default function ProfilePage() {
                   >
                     Editar endereço
                   </button>
+                  <button
+                    className="text-button danger"
+                    onClick={() => setRemoveAddress(a)}
+                  >
+                    Excluir endereço
+                  </button>
                 </article>
               ))}
               <button
@@ -330,9 +363,22 @@ export default function ProfilePage() {
                   </details>
                 ))}
               </div>
-              <button className="primary" onClick={() => setSupport(true)}>
-                Falar com o suporte
-              </button>
+              {supportUrl ? (
+                <a
+                  className="primary"
+                  href={supportUrl}
+                  target={
+                    supportUrl.startsWith("https:") ? "_blank" : undefined
+                  }
+                  rel="noopener noreferrer"
+                >
+                  Falar com o suporte
+                </a>
+              ) : (
+                <button className="primary" onClick={() => setSupport(true)}>
+                  Falar com o suporte
+                </button>
+              )}
             </>
           )}
           {active === "sair" && (
@@ -500,6 +546,40 @@ export default function ProfilePage() {
               <button className="primary">Salvar endereço</button>
             </div>
           </form>
+        </Modal>
+      )}
+      {removeAddress && (
+        <Modal
+          title="Excluir endereço?"
+          onClose={() => setRemoveAddress(undefined)}
+        >
+          <p>
+            {removeAddress.rua}, {removeAddress.numero}. Esse endereço será
+            removido da lista salva neste navegador.
+          </p>
+          <div className="modal-actions">
+            <button
+              className="outline"
+              onClick={() => setRemoveAddress(undefined)}
+            >
+              Manter endereço
+            </button>
+            <button
+              className="primary"
+              onClick={() => {
+                save({
+                  ...profile,
+                  addresses: profile.addresses.filter(
+                    (item) => item.id !== removeAddress.id,
+                  ),
+                });
+                setRemoveAddress(undefined);
+                setMessage("Endereço excluído.");
+              }}
+            >
+              Confirmar exclusão
+            </button>
+          </div>
         </Modal>
       )}
       {support && (

@@ -313,3 +313,45 @@ test("cancelamento com erro mantém consulta e permite recuperar", async ({
   await page.getByRole("button", { name: /Histórico/ }).click();
   await expect(page.locator(".appointment")).toContainText("Cancelada");
 });
+
+test("foto da API aparece e retorna às iniciais se falhar; suporte configurável", async ({
+  page,
+}) => {
+  await fixture(page);
+  await page.route("**/api/profissionais", (r) =>
+    r.fulfill({
+      json: [
+        {
+          id: "ana",
+          nome: "Dra. Ana Lima",
+          crm: "CRM-SP 123",
+          especialidadeId: "e",
+          clinicaId: "c",
+          valorConsulta: 180,
+          fotoUrl: "https://images.example.com/ana.png",
+        },
+      ],
+    }),
+  );
+  await page.route("https://images.example.com/ana.png", (r) =>
+    r.fulfill({
+      contentType: "image/png",
+      body: Buffer.from(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+        "base64",
+      ),
+    }),
+  );
+  await page.goto("/busca");
+  await expect(page.locator(".doctor-card img")).toBeVisible();
+  await page.goto("/profissional/ana");
+  await expect(page.locator(".portrait img")).toBeVisible();
+  await page.route("https://images.example.com/ana.png", (r) => r.abort());
+  await page.reload();
+  await expect(page.locator(".portrait")).toHaveText("DA");
+  await expect(page.locator(".portrait img")).toHaveCount(0);
+  await page.goto("/perfil/ajuda");
+  await expect(
+    page.getByRole("link", { name: "Falar com o suporte" }),
+  ).toHaveAttribute("href", "mailto:suporte@example.com");
+});

@@ -58,6 +58,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
               clinic:
                 clinics.find((c) => c.id === p.clinicaId)?.nome ||
                 "Clínica não informada",
+              photoUrl: typeof p.fotoUrl === "string" ? p.fotoUrl : undefined,
               crm: typeof p.crm === "string" ? p.crm : undefined,
               address: clinics
                 .filter((c) => c.id === p.clinicaId)

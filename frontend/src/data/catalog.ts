@@ -7,6 +7,7 @@ export interface Professional {
   distance: number;
   rating: number;
   initials: string;
+  photoUrl?: string;
   crm?: string;
   address?: string;
 }

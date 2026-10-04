@@ -1,3 +1,4 @@
+import ProfessionalAvatar from "./ProfessionalAvatar";
 import { MapPin, Star } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { currency, type Professional } from "../data/catalog";
@@ -6,9 +7,7 @@ export default function DoctorCard({ doctor }: { doctor: Professional }) {
   return (
     <article className="doctor-card">
       <div className="doctor-intro">
-        <div className="avatar" aria-hidden="true">
-          {doctor.initials}
-        </div>
+        <ProfessionalAvatar doctor={doctor} />
         <div>
           <h3>{doctor.name}</h3>
           <p>{doctor.specialty}</p>

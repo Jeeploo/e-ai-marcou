@@ -8,7 +8,7 @@ A ideia deste documento é mostrar o que ficou pronto, como cada parte funciona 
 
 ## Como ficou a entrega
 
-A parte de frontend da lista foi entregue. As telas, os fluxos, os tratamentos de erro e a PWA estão implementados. O código foi enviado para a branch `frontend`, sem juntar as mudanças com `main` ou `backend`.
+A parte de frontend da lista foi entregue, com os complementos desta revisão descritos abaixo. As telas, os fluxos, os tratamentos de erro e a PWA estão implementados. O código foi enviado para a branch `frontend`, sem juntar as mudanças com `main` ou `backend`.
 
 Para os testes de comunicação, foram simuladas respostas da API. Isso permitiu conferir o que a tela envia e como reage a sucesso, erro e horário ocupado. O teste com o servidor e o banco reais ficou separado para o Jefferson continuar.
 
@@ -157,30 +157,51 @@ As telas e as chamadas já estão prontas. Estes são os passos que faltam para 
 
 ## O que funciona só em parte ou depende de outro serviço
 
-- **Dados pessoais e endereços:** os formulários funcionam, mas salvam na sessão do navegador, em sessionStorage. Ainda não sincronizam com uma conta ou outro dispositivo. Para isso, precisam das rotas do backend e de um acordo sobre os dados enviados.
+- **Dados pessoais e endereços:** os formulários funcionam; endereços podem ser criados, editados e excluídos com confirmação. Campos obrigatórios não aceitam só espaços, e a sigla do estado é conferida. Os dados ainda ficam na sessão do navegador, em sessionStorage. Ainda não sincronizam com uma conta ou outro dispositivo. Para isso, precisam das rotas do backend e de um acordo sobre os dados enviados.
 - **Mapa:** usa o endereço que estiver cadastrado. Se houver apenas “São Paulo/SP”, mostra a região. Para apontar o local certo, precisa do endereço completo. Não calcula distância real nem mostra vários marcadores sincronizados.
 - **Preferências de notificações:** as escolhas são salvas localmente. Nenhuma mensagem é enviada, como combinado para o MVP.
-- **Suporte:** as perguntas frequentes funcionam. O botão de contato externo depende de a equipe informar um canal de atendimento.
-- **Fotos dos profissionais:** são usadas iniciais no lugar das fotos. Fotografias reais não foram incluídas.
+- **Suporte:** as perguntas frequentes funcionam e o botão aceita um contato oficial configurado em VITE_SUPPORT_URL (HTTPS ou mailto). Falta a equipe informar esse contato; isso não depende do backend. Sem configuração válida, a orientação de ajuda continua disponível.
+- **Fotos dos profissionais:** o frontend agora mostra a foto recebida em fotoUrl nos cards e no perfil. Se o endereço não for válido ou a imagem falhar, mostra as iniciais. Faltam as fotos oficiais e seus endereços; a exibição já está pronta. O campo pode vir da API, ou as imagens podem ser incluídas no catálogo local quando forem fornecidas.
 - **CEP e mapa:** precisam de internet e dos serviços externos funcionando. Eles não fazem parte do uso offline da PWA.
 
-## O que não foi feito porque ficou fora do combinado
+## Quem precisa continuar cada parte
 
-- **Login e autorização:** não foram implementados no MVP. Encerrar a sessão local não é um sistema de login.
-- **Pagamento:** não há cobrança, integração com gateway ou processamento financeiro. A escolha visual é apenas uma preferência.
-- **Envio de notificações:** o site não envia SMS, WhatsApp, e-mail ou push.
-- **GPS:** o site não pede a localização do dispositivo.
-- **Outro backend:** não foi criado. O frontend segue a API FastAPI do projeto.
-- **Publicar o site:** a entrega não incluiu colocar o aplicativo em um endereço público. Enviar o código ao GitHub não publica o site automaticamente.
+| Parte | O que já dá para usar | O que falta e de quem depende |
+|---|---|---|
+| Dados pessoais e endereços | Formulários e gerenciamento local de endereços. | Backend: rotas para salvar e consultar dados vinculados ao paciente. Depois, frontend: conectar essas rotas. Não é possível sincronizar contas só com o navegador. |
+| Fotos | Exibição de fotoUrl e iniciais quando a imagem falha. | Equipe: fornecer fotos oficiais ou URLs. Backend: devolver fotoUrl se o catálogo for gerenciado pela API. Não falta construir a exibição. |
+| Suporte | Link externo configurável e perguntas frequentes. | Equipe: informar o contato. Frontend/configuração: preencher VITE_SUPPORT_URL e gerar novo build. Não precisa de backend. |
+| Endereço no mapa | Google Maps usando o endereço disponível. | Equipe: informar endereços completos. Backend: entregá-los no catálogo real. Não é preciso criar outra tela. |
+| Login e autorização | Não implementados, conforme o MVP. | É trabalho conjunto: backend/provedor autentica, controla sessão e permissões; frontend apresenta login e usa a sessão. Uma tela de login sozinha não protege dados. |
+| Pagamento | Não há cobrança; há apenas preferência visual no modo local. | É trabalho conjunto: escolher provedor e regras; backend cria e valida cobranças e recebe confirmações; frontend apresenta o checkout. Não colocar chaves secretas no navegador. |
+| Envio de notificações | Preferências locais. | Backend/provedor: agendar e enviar SMS, WhatsApp, e-mail ou push. Frontend: conectar preferências e, no caso de push, pedir permissão e registrar a inscrição. Não é só um botão ou uma alteração no Service Worker. |
+| GPS | Não implementado; mapa por endereço continua funcionando. | Pode ser feito no frontend com permissão do usuário e HTTPS. Não é uma obrigação do backend. Não foi acrescentado porque a localização do dispositivo continuou fora do escopo. Distâncias reais também precisam das coordenadas das clínicas. |
+| Outro backend | Nenhum foi criado. | Não é uma pendência: devemos usar o FastAPI do projeto. |
+| Publicar o site | Build pronto e instruções em PUBLICACAO.md. | Frontend/hospedagem: escolher o serviço e configurar o endereço público. Não depende de outro backend para publicar a interface. Para consultas reais, a API também precisa estar acessível por HTTPS, com CORS configurado pelo responsável pelo backend. |
 
-Essas funções não ficam como tarefas atrasadas do frontend. Elas estavam fora do escopo desta entrega.
+## O que ficou fora do MVP
+
+Login, cobrança, envio de notificações e GPS continuam sem implementação completa. Eles não foram marcados como concluídos nem como tarefas exclusivas do Jefferson: a tabela explica onde há participação do frontend, do backend ou da equipe.
+
+Não foi publicada uma versão pública nesta revisão. Ainda é preciso definir a hospedagem e o ambiente que será exposto. O envio para o GitHub guarda o código, mas não cria um site público.
+
+## Complementos feitos nesta revisão
+
+- [x] Excluir endereço com confirmação e opção de desistir.
+- [x] Manter edição de endereço e conferir o resultado após salvar.
+- [x] Rejeitar campos de endereço preenchidos só com espaços e siglas de estado inválidas.
+- [x] Mostrar fotos recebidas em fotoUrl nos cards e na página do profissional.
+- [x] Voltar às iniciais se a foto estiver ausente, for inválida ou não carregar.
+- [x] Permitir configurar o contato de suporte sem alterar os componentes.
+- [x] Separar no checklist tarefas de backend, frontend, hospedagem e informações da equipe.
+- [x] Documentar como preparar a publicação, sem publicar um ambiente com dados locais por engano.
 
 ## Resultado dos testes já feitos
 
 - O build de TypeScript e Vite passou.
 - Na revisão final, passaram 16 testes de fluxos e acessibilidade, incluindo teclado e janelas de confirmação.
 - Os três testes anteriores de CEP, mapa e inspeção também passaram na revisão em que foram executados. Não foram repetidos sem uma mudança que justificasse isso.
-- Passaram 6 testes de comunicação e erros: criação, remarcação com 409, cancelamento com falha e nova tentativa, catálogo com falha, horários vazios, falta de internet, bloqueio durante envio e confirmação aberta por link.
+- Na revisão anterior, passaram 6 testes de comunicação e erros: criação, remarcação com 409, cancelamento com falha e nova tentativa, catálogo com falha, horários vazios, falta de internet, bloqueio durante envio e confirmação aberta por link.
 - A checagem automática Axe, com regras WCAG A/AA, não encontrou violações nas sete telas avaliadas em duas larguras.
 - A instalação no Edge, a abertura em janela independente e a recarga offline passaram. Ao terminar, o aplicativo criado no perfil de teste foi removido.
 - O teste com a API real ficou pendente porque a porta 8000 não estava disponível na última verificação.
@@ -216,3 +237,12 @@ Os caminhos abaixo partem da pasta frontend:
 - Configuração dos testes: playwright.config.ts e playwright.api.config.ts.
 - Dependências: package.json e package-lock.json.
 - Checklist do projeto: CHECKLIST.md, com o que foi feito, os testes e as partes que precisam de continuidade na integração.
+
+## Testes dos complementos
+
+- Build aprovado após os novos componentes.
+- 16 testes de fluxos e acessibilidade passaram novamente nas telas afetadas. Somando o teste de endereços e os 7 testes de API, foram 24 testes aprovados nesta revisão.
+- 1 teste novo de endereços aprovado: validação, edição, desistência, exclusão, recarga e acessibilidade da confirmação.
+- 7 testes de API aprovados nesta revisão, incluindo o novo cenário de foto carregada, falha com retorno às iniciais e contato de suporte configurado. Os testes usam respostas simuladas.
+
+As melhorias de endereço continuam locais até existir a integração de perfil. Nenhum contato, foto ou endereço oficial foi inventado.
