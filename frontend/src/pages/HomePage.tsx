@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import {
+  Bone,
+  createLucideIcon,
+  Heart,
+  Sparkles,
+  Stethoscope,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import DoctorCard from "../components/DoctorCard";
 import SearchField from "../components/SearchField";
@@ -7,6 +14,33 @@ import { useCatalog } from "../hooks/CatalogContext";
 import { useProfile } from "../hooks/ProfileContext";
 import { bookingService, dateLabel, isPast } from "../services/api";
 import type { Appointment } from "../types/models";
+
+// lucide-react 0.468 does not yet export Venus.
+const Venus = createLucideIcon("Venus", [
+  ["circle", { cx: "12", cy: "8", r: "5", key: "circle" }],
+  ["path", { d: "M12 13v8M9 18h6", key: "cross" }],
+]);
+
+const specialtyVisuals: Record<
+  string,
+  { icon: LucideIcon; color: string; background: string }
+> = {
+  Cardiologia: { icon: Heart, color: "#b83b48", background: "#ffe5e8" },
+  "Clínica Geral": {
+    icon: Stethoscope,
+    color: "#137568",
+    background: "#def4ed",
+  },
+  Dermatologia: { icon: Sparkles, color: "#b85416", background: "#ffecd9" },
+  Ginecologia: { icon: Venus, color: "#7844b4", background: "#f0e5fc" },
+  Ortopedia: { icon: Bone, color: "#2864b5", background: "#e2edff" },
+};
+const fallbackSpecialtyVisual = {
+  icon: Stethoscope,
+  color: "#137568",
+  background: "#def4ed",
+};
+
 export default function HomePage() {
   const { professionals, specialties, loading, error, reload } = useCatalog(),
     { profile } = useProfile(),
@@ -102,6 +136,11 @@ export default function HomePage() {
               <h2 id="specialties-title">O que você procura hoje?</h2>
               <div className="specialties">
                 {specialties.map((s) => {
+                  const {
+                    icon: Icon,
+                    color,
+                    background,
+                  } = specialtyVisuals[s] ?? fallbackSpecialtyVisual;
                   const count = new Set(
                     professionals
                       .filter((p) => p.specialty === s)
@@ -111,14 +150,41 @@ export default function HomePage() {
                     <Link
                       key={s}
                       to={`/busca?especialidade=${encodeURIComponent(s)}`}
+                      style={{ justifyContent: "flex-start", gap: "12px" }}
                     >
-                      <div>
-                        <h3>{s}</h3>
-                        <p>
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "clamp(40px, 5vw, 56px)",
+                          height: "clamp(40px, 5vw, 56px)",
+                          flexShrink: 0,
+                          borderRadius: "14px",
+                          color,
+                          background,
+                        }}
+                      >
+                        <Icon
+                          size={30}
+                          strokeWidth={1.8}
+                          style={{ display: "block" }}
+                        />
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <h3 style={{ fontSize: "1rem", fontWeight: 700 }}>
+                          {s}
+                        </h3>
+                        <p
+                          style={{
+                            fontSize: "0.875rem",
+                            color: "var(--muted)",
+                          }}
+                        >
                           {count} {count === 1 ? "clínica" : "clínicas"}
                         </p>
                       </div>
-                      <ChevronRight size={18} />
                     </Link>
                   );
                 })}

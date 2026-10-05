@@ -221,6 +221,7 @@ export default function AgendaPage() {
       {details && (
         <Modal
           title="Detalhes da consulta"
+          onBack={() => setDetails(undefined)}
           onClose={() => setDetails(undefined)}
         >
           <h3>

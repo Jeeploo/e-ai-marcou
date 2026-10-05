@@ -1,7 +1,7 @@
 import ProfessionalAvatar from "../components/ProfessionalAvatar";
 import { prototypeExtras } from "../data/features";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Check, MapPin } from "lucide-react";
+import { Check, MapPin } from "lucide-react";
 import {
   Link,
   useLocation,
@@ -22,6 +22,7 @@ import {
 } from "../services/api";
 import type { Slot } from "../types/models";
 import Modal from "../components/Modal";
+import BackButton from "../components/BackButton";
 function isValidDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const parsed = new Date(`${value}T12:00:00Z`);
@@ -75,12 +76,14 @@ export function ProfessionalPage() {
   if (loading)
     return (
       <div className="page-content" role="status">
+        <BackButton to={reschedule ? "/agenda" : back} />
         Carregando profissional…
       </div>
     );
   if (error)
     return (
       <div className="page-content" role="alert">
+        <BackButton to={reschedule ? "/agenda" : back} />
         {error}
         <button className="outline" onClick={reload}>
           Tentar novamente
@@ -90,21 +93,15 @@ export function ProfessionalPage() {
   if (!doctor)
     return (
       <div className="page-content">
+        <BackButton to={reschedule ? "/agenda" : back} />
         <h1>Profissional não encontrado</h1>
-        <Link to="/busca">Voltar à busca</Link>
       </div>
     );
   const details = demoMode ? professionalDetails[doctor.id] : undefined;
   return (
     <>
       <header className="page-header">
-        <Link
-          className="icon-button"
-          aria-label="Voltar"
-          to={reschedule ? "/agenda" : back}
-        >
-          <ArrowLeft />
-        </Link>
+        <BackButton to={reschedule ? "/agenda" : back} />
         <h1>{reschedule ? "Remarcar consulta" : "Perfil do profissional"}</h1>
       </header>
       <div className="page-content professional-layout">
@@ -284,12 +281,14 @@ export function ConfirmPage() {
   if (catalogLoading)
     return (
       <div className="page-content" role="status">
+        <BackButton to={reschedule ? "/agenda" : "/busca"} />
         Carregando resumo…
       </div>
     );
   if (catalogError)
     return (
       <div className="page-content" role="alert">
+        <BackButton to={reschedule ? "/agenda" : "/busca"} />
         {catalogError}
         <button className="outline" onClick={reload}>
           Tentar novamente
@@ -299,6 +298,7 @@ export function ConfirmPage() {
   if (!doctor)
     return (
       <div className="page-content">
+        <BackButton to={reschedule ? "/agenda" : "/busca"} />
         <h1>Selecione um profissional</h1>
         <Link to="/busca">Ir para a busca</Link>
       </div>
@@ -306,13 +306,9 @@ export function ConfirmPage() {
   return (
     <>
       <header className="page-header">
-        <Link
-          className="icon-button"
-          aria-label="Voltar aos horários"
-          to={`/profissional/${id}${reschedule ? `?remarcar=${reschedule}` : ""}`}
-        >
-          <ArrowLeft />
-        </Link>
+        <BackButton
+          to={`/profissional/${id}${reschedule ? `?remarcar=${encodeURIComponent(reschedule)}` : ""}`}
+        />
         <h1>{reschedule ? "Confirmar remarcação" : "Confirmar agendamento"}</h1>
       </header>
       <div className="checkout page-content">

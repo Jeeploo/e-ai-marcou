@@ -1,13 +1,16 @@
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
+import BackButton from "./BackButton";
 export default function Modal({
   title,
   children,
   onClose,
+  onBack,
 }: {
   title: string;
   children: ReactNode;
   onClose: () => void;
+  onBack?: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null),
     titleId = useId();
@@ -53,6 +56,7 @@ export default function Modal({
       }}
     >
       <div className="modal-header">
+        {onBack && <BackButton onBack={onBack} />}
         <h2 id={titleId}>{title}</h2>
         <button className="icon-button" aria-label="Fechar" onClick={onClose}>
           <X size={21} />

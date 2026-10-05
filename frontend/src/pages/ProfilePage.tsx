@@ -3,7 +3,6 @@ import { prototypeExtras } from "../data/features";
 import { lookupPostalCode } from "../services/postal";
 import { useState } from "react";
 import {
-  ArrowLeft,
   Bell,
   ChevronRight,
   HelpCircle,
@@ -16,6 +15,7 @@ import {
 import { Link, useParams } from "react-router-dom";
 import { useProfile } from "../hooks/ProfileContext";
 import Modal from "../components/Modal";
+import BackButton from "../components/BackButton";
 import type { Address } from "../types/models";
 const options = [
   { path: "dados", label: "Dados pessoais", Icon: UserRound },
@@ -95,13 +95,7 @@ export default function ProfilePage() {
   return (
     <>
       <header className="page-header">
-        <Link
-          to="/perfil"
-          className="mobile-only icon-button"
-          aria-label="Voltar ao perfil"
-        >
-          <ArrowLeft />
-        </Link>
+        {section && <BackButton to="/perfil" />}
         <h1>Meu perfil</h1>
       </header>
       <div

@@ -4,7 +4,7 @@ test("busca preserva filtros e mostra estado vazio", async ({ page }) => {
   await page.getByRole("link", { name: "Cardiologia 2 clínicas" }).click();
   await expect(page.locator(".doctor-card")).toHaveCount(2);
   await page.getByRole("link", { name: "Ver horários" }).first().click();
-  await page.getByRole("link", { name: "Voltar", exact: true }).click();
+  await page.getByRole("button", { name: "Voltar", exact: true }).click();
   await expect(page).toHaveURL(/especialidade=Cardiologia/);
   await page
     .getByRole("textbox", { name: "Pesquisar", exact: true })
@@ -154,6 +154,34 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
     ]) {
       await page.goto(route);
       await page.waitForTimeout(150);
+      if (route === "/") {
+        const cards = page.locator(".specialties a");
+        await expect(cards.first()).toBeVisible();
+        const layout = await cards.evaluateAll((elements) =>
+          elements.map((element) => {
+            const rect = element.getBoundingClientRect();
+            const title = element.querySelector("h3")!;
+            const range = document.createRange();
+            range.selectNodeContents(title);
+            return {
+              left: rect.left,
+              right: rect.right,
+              titleLines: range.getClientRects().length,
+            };
+          }),
+        );
+        for (const card of layout) {
+          expect(card.left).toBeGreaterThanOrEqual(0);
+          expect(card.right).toBeLessThanOrEqual(width);
+          expect(card.titleLines).toBe(1);
+        }
+        await expect(page.locator(".specialties")).toHaveCSS(
+          "grid-template-columns",
+          new RegExp(
+            `^(\\S+\\s+){${width <= 540 ? 0 : width <= 1150 ? 1 : 2}}\\S+$`,
+          ),
+        );
+      }
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= window.innerWidth + 1,
@@ -161,6 +189,48 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
         route,
       ).toBeTruthy();
     }
+  });
+for (const width of [375, 1440])
+  test(`voltar visível nas telas secundárias em ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ["/", "/busca", "/agenda", "/perfil"]) {
+      await page.goto(route);
+      await expect(
+        page.getByRole("button", { name: "Voltar", exact: true }),
+      ).toHaveCount(0);
+    }
+    for (const route of [
+      "/profissional/ana",
+      "/profissional/ana?remarcar=consulta",
+      "/confirmar?profissional=ana",
+      "/confirmar?profissional=ana&remarcar=consulta",
+      "/perfil/dados",
+      "/perfil/enderecos",
+      "/perfil/notificacoes",
+      "/perfil/texto",
+    ]) {
+      await page.goto(route);
+      const back = page.getByRole("button", { name: "Voltar", exact: true });
+      await expect(back).toBeVisible();
+      await expect(back).toBeInViewport();
+      const rect = await back.boundingBox();
+      expect(rect!.width).toBeGreaterThanOrEqual(44);
+      expect(rect!.height).toBeGreaterThanOrEqual(44);
+      await expect(back.locator("svg")).toHaveClass(/lucide-arrow-left/);
+      await expect(back).toHaveCSS("color", "rgb(18, 59, 58)");
+      await expect(back).toHaveCSS("background-color", "rgb(255, 255, 255)");
+    }
+    await page.goto("/agenda");
+    await page.getByRole("button", { name: "Ver detalhes" }).first().click();
+    const back = page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Voltar", exact: true });
+    await expect(back).toBeVisible();
+    await expect(back).toBeInViewport();
+    await back.click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 test("texto grande não gera overflow em celular", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });

@@ -307,6 +307,8 @@ section > h2 {
   gap: 10px;
 }
 .specialties a {
+  min-width: 0;
+  min-height: 44px;
   border: 1px solid var(--border);
   background: white;
   border-radius: 10px;
@@ -318,6 +320,8 @@ section > h2 {
 }
 .specialties h3 {
   color: var(--green);
+  overflow-wrap: normal;
+  word-break: normal;
 }
 .specialties p {
   font-size: 0.8rem;
@@ -514,6 +518,9 @@ select {
   font-size: 1.6rem;
 }
 @media (max-width: 1150px) {
+  .specialties {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .page-content {
     padding: 26px;
   }
@@ -688,6 +695,11 @@ select {
 button:disabled {
   cursor: not-allowed;
   opacity: 0.48;
+}
+.back-button {
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
 }
 .icon-button {
   display: inline-flex;
@@ -1557,11 +1569,10 @@ dialog::backdrop {
   .visit-time span {
     font-size: 0.7rem;
   }
-  .specialties a {
-    min-width: 0;
-  }
-  .specialties h3 {
-    overflow-wrap: anywhere;
+}
+@media (max-width: 540px) {
+  .specialties {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 .region-map {
