@@ -1,3 +1,5 @@
+from app.repositories.contracts import CatalogRepository
+
 from google.cloud.firestore import Client
 
 from app.core.firebase import get_firestore_client
@@ -29,5 +31,7 @@ class ProfissionalRepository:
         return ProfissionalResponse(**{**document.to_dict(), "id": document.id})
 
 
-def get_profissional_repository() -> ProfissionalRepository:
-    return ProfissionalRepository(get_firestore_client())
+def get_profissional_repository() -> CatalogRepository[ProfissionalResponse]:
+    from app.repositories.provider import select_repository
+
+    return select_repository("profissionais", lambda: ProfissionalRepository(get_firestore_client()))

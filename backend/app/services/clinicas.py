@@ -2,12 +2,13 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from app.repositories.clinicas import ClinicaRepository, get_clinica_repository
+from app.repositories.contracts import CatalogRepository
+from app.repositories.clinicas import get_clinica_repository
 from app.schemas.clinicas import ClinicaCreate, ClinicaResponse
 
 
 class ClinicaService:
-    def __init__(self, repository: ClinicaRepository):
+    def __init__(self, repository: CatalogRepository[ClinicaResponse]):
         self.repository = repository
 
     def create(self, clinica: ClinicaCreate) -> ClinicaResponse:
@@ -18,6 +19,6 @@ class ClinicaService:
 
 
 def get_clinica_service(
-    repository: Annotated[ClinicaRepository, Depends(get_clinica_repository)],
+    repository: Annotated[CatalogRepository[ClinicaResponse], Depends(get_clinica_repository)],
 ) -> ClinicaService:
     return ClinicaService(repository)

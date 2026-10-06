@@ -1,3 +1,5 @@
+from app.repositories.contracts import AgendamentoDataRepository
+
 from datetime import datetime, timezone
 
 from google.cloud.firestore import Client, transactional
@@ -141,5 +143,7 @@ class AgendamentoRepository:
         return [AgendamentoResponse(**{**doc.to_dict(), "id": doc.id}) for doc in query.stream()]
 
 
-def get_agendamento_repository() -> AgendamentoRepository:
-    return AgendamentoRepository(get_firestore_client())
+def get_agendamento_repository() -> AgendamentoDataRepository:
+    from app.repositories.provider import select_repository
+
+    return select_repository("agendamentos", lambda: AgendamentoRepository(get_firestore_client()))

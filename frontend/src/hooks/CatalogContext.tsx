@@ -6,12 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  professionals as samples,
-  specialties as sampleSpecialties,
-  type Professional,
-} from "../data/catalog";
-import { catalogApi, demoMode, friendlyError } from "../services/api";
+import type { Professional } from "../data/catalog";
+import { catalogApi, friendlyError } from "../services/api";
 interface Catalog {
   professionals: Professional[];
   specialties: string[];
@@ -21,15 +17,12 @@ interface Catalog {
 }
 const Context = createContext<Catalog | null>(null);
 export function CatalogProvider({ children }: { children: ReactNode }) {
-  const [professionals, setProfessionals] = useState<Professional[]>(
-      demoMode ? samples : [],
-    ),
-    [specialties, setSpecialties] = useState(demoMode ? sampleSpecialties : []),
-    [loading, setLoading] = useState(!demoMode),
+  const [professionals, setProfessionals] = useState<Professional[]>([]),
+    [specialties, setSpecialties] = useState<string[]>([]),
+    [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
     [revision, setRevision] = useState(0);
   useEffect(() => {
-    if (demoMode) return;
     let active = true;
     setLoading(true);
     setError("");

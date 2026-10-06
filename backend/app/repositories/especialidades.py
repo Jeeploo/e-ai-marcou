@@ -1,3 +1,5 @@
+from app.repositories.contracts import CatalogRepository
+
 from google.cloud.firestore import Client
 
 from app.core.firebase import get_firestore_client
@@ -30,5 +32,7 @@ class EspecialidadeRepository:
         return EspecialidadeResponse(**{**document.to_dict(), "id": document.id})
 
 
-def get_especialidade_repository() -> EspecialidadeRepository:
-    return EspecialidadeRepository(get_firestore_client())
+def get_especialidade_repository() -> CatalogRepository[EspecialidadeResponse]:
+    from app.repositories.provider import select_repository
+
+    return select_repository("especialidades", lambda: EspecialidadeRepository(get_firestore_client()))

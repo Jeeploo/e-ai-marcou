@@ -7,8 +7,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import { List, MapPin, SlidersHorizontal } from "lucide-react";
 import DoctorCard from "../components/DoctorCard";
 import { useCatalog } from "../hooks/CatalogContext";
-import { professionalDetails } from "../data/catalog";
-import { demoMode } from "../services/api";
 export function SearchPage() {
   const online = useOnline();
   const gps = useDeviceLocation();
@@ -58,10 +56,7 @@ export function SearchPage() {
     );
   const active =
     results.find((p) => p.id === params.get("destaque")) || results[0];
-  const mapAddress =
-    active?.address ||
-    (demoMode && active ? professionalDetails[active.id]?.address : "") ||
-    "São Paulo, SP";
+  const mapAddress = active?.address || "São Paulo, SP";
   return (
     <>
       <header className="page-header">
@@ -151,7 +146,7 @@ export function SearchPage() {
               .filter(
                 ([key]) =>
                   key === "preco" ||
-                  (key === "distancia" ? canSortDistance : demoMode),
+                  (key === "distancia" && canSortDistance),
               )
               .map(([value, label]) => (
                 <button

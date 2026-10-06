@@ -1,5 +1,4 @@
 import ProfessionalAvatar from "../components/ProfessionalAvatar";
-import { prototypeExtras } from "../data/features";
 import { useEffect, useState } from "react";
 import { Check, MapPin } from "lucide-react";
 import {
@@ -11,13 +10,12 @@ import {
 } from "react-router-dom";
 import { useCatalog } from "../hooks/CatalogContext";
 import { useOnline } from "../hooks/useOnline";
-import { currency, professionalDetails } from "../data/catalog";
+import { currency } from "../data/catalog";
 import {
   ApiError,
   bookingService,
   dateLabel,
   day,
-  demoMode,
   friendlyError,
 } from "../services/api";
 import type { Slot } from "../types/models";
@@ -97,7 +95,6 @@ export function ProfessionalPage() {
         <h1>Profissional não encontrado</h1>
       </div>
     );
-  const details = demoMode ? professionalDetails[doctor.id] : undefined;
   return (
     <>
       <header className="page-header">
@@ -109,20 +106,15 @@ export function ProfessionalPage() {
           <ProfessionalAvatar doctor={doctor} portrait />
           <h2>{doctor.name}</h2>
           <p className="professional-specialty">{doctor.specialty}</p>
-          <p>{doctor.crm || details?.crm || "Consulte o CRM com a clínica"}</p>
+          <p>{doctor.crm || "Consulte o CRM com a clínica"}</p>
           <h3 className="spaced-heading">Sobre o médico</h3>
           <p>
-            {details?.bio ||
-              "Entre em contato com a clínica para mais informações sobre o profissional."}
+            Entre em contato com a clínica para mais informações sobre o profissional.
           </p>
           <h3 className="spaced-heading">
             <MapPin size={19} className="inline-icon" /> {doctor.clinic}
           </h3>
-          <p>
-            {doctor.address ||
-              details?.address ||
-              "Endereço a confirmar com a clínica"}
-          </p>
+          <p>{doctor.address || "Endereço a confirmar com a clínica"}</p>
         </section>
         <section className="panel availability">
           <p>Valor da consulta</p>
@@ -235,8 +227,7 @@ export function ConfirmPage() {
     [loading, setLoading] = useState(true),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [success, setSuccess] = useState(false),
-    [payment, setPayment] = useState("Pix");
+    [success, setSuccess] = useState(false);
   useEffect(() => {
     let active = true;
     setSlot(undefined);
@@ -340,9 +331,7 @@ export function ConfirmPage() {
                   <dd>
                     {doctor.clinic}
                     <br />
-                    {demoMode
-                      ? professionalDetails[id]?.address
-                      : doctor.address}
+                    {doctor.address}
                   </dd>
                 </div>
                 <div className="receipt-total">
@@ -351,30 +340,6 @@ export function ConfirmPage() {
                 </div>
               </dl>
             </section>
-            {prototypeExtras && demoMode && (
-              <fieldset className="payment-options">
-                <legend>Como prefere pagar?</legend>
-                <p className="hint">
-                  Escolha sua preferência. O pagamento deverá ser combinado com
-                  a clínica.
-                </p>
-                <div>
-                  {["Pix", "Cartão de crédito", "Pagar na clínica"].map(
-                    (method) => (
-                      <label key={method}>
-                        <input
-                          type="radio"
-                          name="payment"
-                          checked={payment === method}
-                          onChange={() => setPayment(method)}
-                        />
-                        <span>{method}</span>
-                      </label>
-                    ),
-                  )}
-                </div>
-              </fieldset>
-            )}
             {error && (
               <p className="error-message" role="alert">
                 {error}
@@ -408,11 +373,9 @@ export function ConfirmPage() {
       {success && (
         <Modal
           title={
-            demoMode
-              ? "Solicitação salva neste dispositivo"
-              : reschedule
-                ? "Consulta remarcada!"
-                : "Tudo certo! Consulta confirmada."
+            reschedule
+              ? "Consulta remarcada!"
+              : "Tudo certo! Consulta confirmada."
           }
           onClose={() => navigate("/agenda")}
         >
@@ -420,11 +383,7 @@ export function ConfirmPage() {
             <div className="success-check">
               <Check size={44} />
             </div>
-            <p>
-              {demoMode
-                ? "Solicitação salva neste dispositivo. A confirmação com a clínica ainda é necessária."
-                : "Seu agendamento foi registrado."}
-            </p>
+            <p>Seu agendamento foi registrado.</p>
             <div className="success-summary">
               <strong>{doctor.name}</strong>
               <p>{doctor.clinic}</p>

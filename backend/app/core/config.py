@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Literal
 
 from dotenv import dotenv_values
 from pydantic import BaseModel, Field
@@ -11,6 +12,7 @@ class Settings(BaseModel):
         "http://localhost:5173",
         "http://127.0.0.1:5173",
     ])
+    data_mode: Literal["firebase", "demo"] = "firebase"
     firebase_credentials: str | None = None
     firebase_project_id: str | None = None
 
@@ -32,6 +34,7 @@ def load_settings() -> Settings:
     return Settings(
         app_name=os.environ.get("APP_NAME") or values.get("APP_NAME") or "e aí, marcou?",
         cors_origins=cors_origins,
+        data_mode=os.environ.get("DATA_MODE", values.get("DATA_MODE")) or "firebase",
         firebase_credentials=os.environ.get(
             "FIREBASE_CREDENTIALS", values.get("FIREBASE_CREDENTIALS")
         ),

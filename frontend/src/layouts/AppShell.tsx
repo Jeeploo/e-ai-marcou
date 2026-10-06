@@ -12,7 +12,6 @@ import {
 import { NavLink, Outlet, Link, useLocation } from "react-router-dom";
 import { useOnline } from "../hooks/useOnline";
 import { useProfile } from "../hooks/ProfileContext";
-import { demoMode } from "../services/api";
 const navigation = [
   { to: "/", text: "Início", Icon: Home },
   { to: "/busca", text: "Busca", Icon: Search },

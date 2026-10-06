@@ -12,7 +12,8 @@
     "format": "prettier --write src tests vite.config.ts playwright.config.ts",
     "test:api": "playwright test --config playwright.api.config.ts",
     "dev:api": "vite --mode api",
-    "build:api": "tsc --noEmit && vite build --mode api"
+    "build:api": "tsc --noEmit && vite build --mode api",
+    "test:demo": "playwright test --config playwright.demo.config.ts"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

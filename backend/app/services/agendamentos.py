@@ -2,16 +2,17 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 
+from app.repositories.contracts import AgendamentoDataRepository
 from app.repositories.agendamentos import (
     AgendamentoNaoEncontradoError, AgendamentoInativoError, MesmoHorarioError,
-    AgendamentoRepository, HorarioNaoEncontradoError, HorarioIndisponivelError,
+    HorarioNaoEncontradoError, HorarioIndisponivelError,
     ProfissionalNaoEncontradoError, get_agendamento_repository,
 )
 from app.schemas.agendamentos import AgendamentoCreate, AgendamentoResponse
 
 
 class AgendamentoService:
-    def __init__(self, repository: AgendamentoRepository):
+    def __init__(self, repository: AgendamentoDataRepository):
         self.repository = repository
 
     def create(self, agendamento: AgendamentoCreate) -> AgendamentoResponse:
@@ -60,6 +61,6 @@ class AgendamentoService:
 
 
 def get_agendamento_service(
-    repository: Annotated[AgendamentoRepository, Depends(get_agendamento_repository)],
+    repository: Annotated[AgendamentoDataRepository, Depends(get_agendamento_repository)],
 ) -> AgendamentoService:
     return AgendamentoService(repository)

@@ -1,3 +1,5 @@
+from app.repositories.contracts import HorarioDataRepository
+
 import hashlib
 import json
 
@@ -46,5 +48,7 @@ class HorarioRepository:
         )]
 
 
-def get_horario_repository() -> HorarioRepository:
-    return HorarioRepository(get_firestore_client())
+def get_horario_repository() -> HorarioDataRepository:
+    from app.repositories.provider import select_repository
+
+    return select_repository("horarios", lambda: HorarioRepository(get_firestore_client()))

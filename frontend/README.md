@@ -10,4 +10,25 @@ Para preparar o endereço público, veja [como publicar](./PUBLICACAO.md). O che
 
 ## Inicialização direta com a API
 
-Use `npm run dev:api` para usar o FastAPI e `npm run build:api` para compilar nesse modo. Configure `VITE_API_URL` e `VITE_PATIENT_ID` com os dados fornecidos pelo backend. Esses comandos não usam o catálogo local, mesmo se `VITE_DATA_MODE=demo` estiver configurado. O backend precisa estar acessível.
+Use `npm run dev` com o backend em execução. O frontend usa exclusivamente a
+API HTTP, tanto com `DATA_MODE=demo` quanto com `DATA_MODE=firebase` no backend.
+Em desenvolvimento, `VITE_API_URL` é opcional e tem fallback para
+`http://localhost:8000`. `VITE_PATIENT_ID` tem padrão `paciente-demo`.
+`VITE_DATA_MODE` não seleciona mais mocks locais. Os comandos `dev:api` e
+`build:api` continuam disponíveis por compatibilidade.
+
+Veja [execução rápida sem Firebase](../README.md#execução-rápida-para-avaliação--sem-firebase)
+para preparar o backend. A documentação anterior de protótipo no checklist deve
+ser lida considerando que agendamentos e catálogos agora vêm da API.
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run test:api
+npm run test:demo
+```
+
+`test:api` testa contratos com respostas HTTP controladas. `test:demo` inicia o
+FastAPI com dados em memória e valida o fluxo real pela interface, sem mocks.
+O segundo comando de teste requer o ambiente `backend/.venv` preparado.

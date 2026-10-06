@@ -2,18 +2,21 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 
-from app.repositories.clinicas import ClinicaRepository, get_clinica_repository
-from app.repositories.especialidades import EspecialidadeRepository, get_especialidade_repository
-from app.repositories.profissionais import ProfissionalRepository, get_profissional_repository
+from app.repositories.contracts import CatalogRepository
+from app.schemas.especialidades import EspecialidadeResponse
+from app.schemas.clinicas import ClinicaResponse
+from app.repositories.clinicas import get_clinica_repository
+from app.repositories.especialidades import get_especialidade_repository
+from app.repositories.profissionais import get_profissional_repository
 from app.schemas.profissionais import ProfissionalCreate, ProfissionalResponse
 
 
 class ProfissionalService:
     def __init__(
         self,
-        repository: ProfissionalRepository,
-        especialidade_repository: EspecialidadeRepository,
-        clinica_repository: ClinicaRepository,
+        repository: CatalogRepository[ProfissionalResponse],
+        especialidade_repository: CatalogRepository[EspecialidadeResponse],
+        clinica_repository: CatalogRepository[ClinicaResponse],
     ):
         self.repository = repository
         self.especialidade_repository = especialidade_repository
@@ -39,8 +42,8 @@ class ProfissionalService:
 
 
 def get_profissional_service(
-    repository: Annotated[ProfissionalRepository, Depends(get_profissional_repository)],
-    especialidade_repository: Annotated[EspecialidadeRepository, Depends(get_especialidade_repository)],
-    clinica_repository: Annotated[ClinicaRepository, Depends(get_clinica_repository)],
+    repository: Annotated[CatalogRepository[ProfissionalResponse], Depends(get_profissional_repository)],
+    especialidade_repository: Annotated[CatalogRepository[EspecialidadeResponse], Depends(get_especialidade_repository)],
+    clinica_repository: Annotated[CatalogRepository[ClinicaResponse], Depends(get_clinica_repository)],
 ) -> ProfissionalService:
     return ProfissionalService(repository, especialidade_repository, clinica_repository)

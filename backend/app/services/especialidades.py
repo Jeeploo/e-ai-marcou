@@ -2,15 +2,15 @@ from typing import Annotated
 
 from fastapi import Depends
 
+from app.repositories.contracts import CatalogRepository
 from app.repositories.especialidades import (
-    EspecialidadeRepository,
     get_especialidade_repository,
 )
 from app.schemas.especialidades import EspecialidadeCreate, EspecialidadeResponse
 
 
 class EspecialidadeService:
-    def __init__(self, repository: EspecialidadeRepository):
+    def __init__(self, repository: CatalogRepository[EspecialidadeResponse]):
         self.repository = repository
 
     def create(self, especialidade: EspecialidadeCreate) -> EspecialidadeResponse:
@@ -24,7 +24,7 @@ class EspecialidadeService:
 
 def get_especialidade_service(
     repository: Annotated[
-        EspecialidadeRepository, Depends(get_especialidade_repository)
+        CatalogRepository[EspecialidadeResponse], Depends(get_especialidade_repository)
     ],
 ) -> EspecialidadeService:
     return EspecialidadeService(repository)

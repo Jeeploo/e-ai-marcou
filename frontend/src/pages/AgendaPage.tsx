@@ -8,9 +8,8 @@ import {
   dateLabel,
   friendlyError,
   isPast,
-  demoMode,
 } from "../services/api";
-import { currency, professionalDetails } from "../data/catalog";
+import { currency } from "../data/catalog";
 import type { Appointment } from "../types/models";
 import Modal from "../components/Modal";
 export default function AgendaPage() {
@@ -231,10 +230,10 @@ export default function AgendaPage() {
             {dateLabel(details.data)} · {details.hora}
           </p>
           <p>
-            {demoMode
-              ? professionalDetails[details.profissionalId]?.address
-              : professionals.find((p) => p.id === details.profissionalId)
-                  ?.address}
+            {
+              professionals.find((p) => p.id === details.profissionalId)
+                ?.address
+            }
           </p>
           <p>
             {

@@ -2,13 +2,15 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 
-from app.repositories.horarios import HorarioRepository, HorarioDuplicadoError, get_horario_repository
-from app.repositories.profissionais import ProfissionalRepository, get_profissional_repository
+from app.repositories.contracts import CatalogRepository, HorarioDataRepository
+from app.schemas.profissionais import ProfissionalResponse
+from app.repositories.horarios import HorarioDuplicadoError, get_horario_repository
+from app.repositories.profissionais import get_profissional_repository
 from app.schemas.horarios import HorarioCreate, HorarioResponse
 
 
 class HorarioService:
-    def __init__(self, repository: HorarioRepository, profissional_repository: ProfissionalRepository):
+    def __init__(self, repository: HorarioDataRepository, profissional_repository: CatalogRepository[ProfissionalResponse]):
         self.repository = repository
         self.profissional_repository = profissional_repository
 
@@ -28,7 +30,7 @@ class HorarioService:
 
 
 def get_horario_service(
-    repository: Annotated[HorarioRepository, Depends(get_horario_repository)],
-    profissional_repository: Annotated[ProfissionalRepository, Depends(get_profissional_repository)],
+    repository: Annotated[HorarioDataRepository, Depends(get_horario_repository)],
+    profissional_repository: Annotated[CatalogRepository[ProfissionalResponse], Depends(get_profissional_repository)],
 ) -> HorarioService:
     return HorarioService(repository, profissional_repository)
