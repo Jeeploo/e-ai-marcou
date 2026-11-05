@@ -9,6 +9,7 @@ from app.schemas.horarios import Data, Hora
 class AgendamentoCreate(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
 
+    paraQuem: Literal["mim", "outra_pessoa"] = "mim"
     pacienteId: str = Field(min_length=1)
     horarioId: str = Field(min_length=1)
 
@@ -21,6 +22,7 @@ class AgendamentoReagendar(BaseModel):
 
 class AgendamentoResponse(BaseModel):
     id: str
+    paraQuem: Literal["mim", "outra_pessoa"] = "mim"
     pacienteId: str
     profissionalId: str
     clinicaId: str

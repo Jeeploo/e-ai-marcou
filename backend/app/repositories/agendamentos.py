@@ -39,7 +39,7 @@ class AgendamentoRepository:
     def __init__(self, client: Client):
         self.client = client
 
-    def create(self, pacienteId: str, horarioId: str) -> AgendamentoResponse:
+    def create(self, pacienteId: str, horarioId: str, paraQuem: str = "mim") -> AgendamentoResponse:
         horario_ref = self.client.collection("horarios").document(horarioId)
         agendamento_ref = self.client.collection("agendamentos").document()
 
@@ -59,7 +59,7 @@ class AgendamentoRepository:
                 **{**profissional_snapshot.to_dict(), "id": profissional_snapshot.id}
             )
             payload = dict(
-                pacienteId=pacienteId, horarioId=horarioId,
+                pacienteId=pacienteId, horarioId=horarioId, paraQuem=paraQuem,
                 profissionalId=horario.profissionalId, clinicaId=horario.clinicaId,
                 data=horario.data, hora=horario.hora, valor=profissional.valorConsulta,
                 status="agendado", criadoEm=datetime.now(timezone.utc),

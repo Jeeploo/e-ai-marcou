@@ -113,6 +113,11 @@ export default function AgendaPage() {
               <article className="appointment" key={item.id}>
                 <div className="appointment-time">
                   <span>{dateLabel(item.data)}</span>
+                  <p>
+                    {item.paraQuem === "outra_pessoa"
+                      ? "Para outra pessoa"
+                      : "Para mim"}
+                  </p>
                   <strong>{item.hora}</strong>
                 </div>
                 <div className="appointment-info">
@@ -228,6 +233,9 @@ export default function AgendaPage() {
           </h3>
           <p>
             {dateLabel(details.data)} · {details.hora}
+            {details.paraQuem === "outra_pessoa"
+              ? " · Para outra pessoa"
+              : " · Para mim"}
           </p>
           <p>
             {

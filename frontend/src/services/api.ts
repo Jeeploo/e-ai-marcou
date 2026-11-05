@@ -63,10 +63,10 @@ export const bookingService = {
     request<Slot[]>(
       `/api/horarios?profissionalId=${encodeURIComponent(profissionalId)}&data=${data}`,
     ),
-  create: (horarioId: string) =>
+  create: (horarioId: string, paraQuem: "mim" | "outra_pessoa" = "mim") =>
     request<Appointment>("/api/agendamentos", {
       method: "POST",
-      body: JSON.stringify({ pacienteId: patientId, horarioId }),
+      body: JSON.stringify({ pacienteId: patientId, horarioId, paraQuem }),
     }),
   reschedule: (id: string, novoHorarioId: string) =>
     request<void>(`/api/agendamentos/${encodeURIComponent(id)}/reagendar`, {
@@ -78,7 +78,27 @@ export const bookingService = {
       method: "DELETE",
     }),
 };
+interface SearchResult {
+  id: string;
+  nome: string;
+  especialidade: string;
+  valorConsulta: number;
+  fotoUrl?: string;
+  distanciaKm: number | null;
+  proximoHorario: { id: string; data: string; hora: string } | null;
+  clinica: {
+    nome: string;
+    endereco: string;
+    bairro: string;
+    cidade: string;
+    uf: string;
+    cep: string;
+    complemento?: string;
+  };
+}
 export const catalogApi = {
+  search: (params: URLSearchParams) =>
+    request<SearchResult[]>(`/api/profissionais/busca?${params}`),
   professionals: () => request<unknown[]>("/api/profissionais"),
   specialties: () =>
     request<{ id: string; nome: string }[]>("/api/especialidades"),

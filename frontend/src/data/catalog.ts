@@ -1,4 +1,5 @@
 export interface Professional {
+  nextSlot?: { id: string; data: string; hora: string } | null;
   id: string;
   name: string;
   specialty: string;

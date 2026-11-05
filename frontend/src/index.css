@@ -291,7 +291,7 @@ section > h2 {
   border: 1px solid var(--orange);
 }
 .primary:hover {
-  background: #d44624;
+  background: #b83a19;
 }
 .outline {
   color: var(--green);
@@ -1751,3 +1751,73 @@ dialog::backdrop {
 
 .location-controls { margin: 1rem 0; display: flex; flex-wrap: wrap; gap: .75rem; }
 .location-controls p { flex-basis: 100%; margin: 0; overflow-wrap: anywhere; }
+
+.location-controls label { display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.location-controls select { max-width: 100%; }
+.doctor-card p { overflow-wrap: anywhere; }
+
+.appointment-time p { color: inherit; }
+
+/* Busca: sequência visual e de teclado compartilhada em todas as larguras. */
+.search-page .search-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+.search-page .search-controls label,
+.search-page .location-controls label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+.search-page .location-controls-compact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+.location-controls-compact > .outline {
+  min-height: 46px;
+  margin: 0;
+}
+.location-controls-compact .location-feedback,
+.location-controls-compact .location-note {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.location-controls-compact summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: list-item;
+  align-content: center;
+}
+.search-page .search-hint {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 8px 0 12px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (min-width: 1000px) {
+  .search-page .search-controls {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, .8fr);
+  }
+  .search-page .location-controls-compact {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) minmax(0, .85fr);
+    column-gap: 12px;
+    row-gap: 4px;
+  }
+}

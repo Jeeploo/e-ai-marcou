@@ -12,7 +12,7 @@ from app.schemas.profissionais import ProfissionalResponse
 
 CLINICA = {
     "nome": "Clínica Central", "endereco": "Rua Central, 10", "cidade": "Recife",
-    "uf": "PE", "telefone": None,
+    "uf": "PE", "telefone": None, "bairro": "", "cep": "", "complemento": None, "latitude": None, "longitude": None,
 }
 PROFISSIONAL = {
     "nome": "Maria Silva", "crm": "12345", "especialidadeId": "especialidade-id",

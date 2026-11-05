@@ -53,6 +53,15 @@ export default function ProfilePage() {
   function saveAddress(e: React.FormEvent) {
     e.preventDefault();
     if (!address) return;
+    if (
+      (address.latitude === undefined) !==
+      (address.longitude === undefined)
+    ) {
+      setAddressError(
+        "Informe latitude e longitude juntas ou deixe ambas vazias.",
+      );
+      return;
+    }
     if (address.cep.replace(/\D/g, "").length !== 8) {
       setAddressError("Informe um CEP com 8 números.");
       return;
@@ -397,6 +406,57 @@ export default function ProfilePage() {
         >
           <form onSubmit={saveAddress} className="address-form">
             <label>
+              Nome do local
+              <input
+                value={address.nome || ""}
+                onChange={(e) =>
+                  setAddress({ ...address, nome: e.target.value })
+                }
+              />
+            </label>
+            <p>
+              Coordenadas opcionais, informadas manualmente. Não buscamos
+              coordenadas pelo endereço.
+            </p>
+            <label>
+              Latitude
+              <input
+                type="number"
+                step="any"
+                min="-90"
+                max="90"
+                value={address.latitude ?? ""}
+                onChange={(e) =>
+                  setAddress({
+                    ...address,
+                    latitude:
+                      e.target.value === ""
+                        ? undefined
+                        : Number(e.target.value),
+                  })
+                }
+              />
+            </label>
+            <label>
+              Longitude
+              <input
+                type="number"
+                step="any"
+                min="-180"
+                max="180"
+                value={address.longitude ?? ""}
+                onChange={(e) =>
+                  setAddress({
+                    ...address,
+                    longitude:
+                      e.target.value === ""
+                        ? undefined
+                        : Number(e.target.value),
+                  })
+                }
+              />
+            </label>
+            <label>
               CEP
               <input
                 required
@@ -405,7 +465,12 @@ export default function ProfilePage() {
                 value={address.cep}
                 placeholder="00000-000"
                 onChange={(e) =>
-                  setAddress({ ...address, cep: e.target.value })
+                  setAddress({
+                    ...address,
+                    latitude: undefined,
+                    longitude: undefined,
+                    cep: e.target.value,
+                  })
                 }
               />
             </label>
@@ -421,7 +486,12 @@ export default function ProfilePage() {
                   const found = await lookupPostalCode(queried);
                   setAddress((current) =>
                     current?.cep === queried
-                      ? { ...current, ...found }
+                      ? {
+                          ...current,
+                          ...found,
+                          latitude: undefined,
+                          longitude: undefined,
+                        }
                       : current,
                   );
                 } catch (error) {
@@ -449,7 +519,12 @@ export default function ProfilePage() {
                 required
                 value={address.rua}
                 onChange={(e) =>
-                  setAddress({ ...address, rua: e.target.value })
+                  setAddress({
+                    ...address,
+                    latitude: undefined,
+                    longitude: undefined,
+                    rua: e.target.value,
+                  })
                 }
               />
             </label>
@@ -460,7 +535,12 @@ export default function ProfilePage() {
                   required
                   value={address.numero}
                   onChange={(e) =>
-                    setAddress({ ...address, numero: e.target.value })
+                    setAddress({
+                      ...address,
+                      latitude: undefined,
+                      longitude: undefined,
+                      numero: e.target.value,
+                    })
                   }
                 />
               </label>
@@ -480,7 +560,12 @@ export default function ProfilePage() {
                 required
                 value={address.bairro}
                 onChange={(e) =>
-                  setAddress({ ...address, bairro: e.target.value })
+                  setAddress({
+                    ...address,
+                    latitude: undefined,
+                    longitude: undefined,
+                    bairro: e.target.value,
+                  })
                 }
               />
             </label>
@@ -491,7 +576,12 @@ export default function ProfilePage() {
                   required
                   value={address.cidade}
                   onChange={(e) =>
-                    setAddress({ ...address, cidade: e.target.value })
+                    setAddress({
+                      ...address,
+                      latitude: undefined,
+                      longitude: undefined,
+                      cidade: e.target.value,
+                    })
                   }
                 />
               </label>
@@ -503,7 +593,12 @@ export default function ProfilePage() {
                   maxLength={2}
                   value={address.uf}
                   onChange={(e) =>
-                    setAddress({ ...address, uf: e.target.value.toUpperCase() })
+                    setAddress({
+                      ...address,
+                      latitude: undefined,
+                      longitude: undefined,
+                      uf: e.target.value.toUpperCase(),
+                    })
                   }
                 />
               </label>

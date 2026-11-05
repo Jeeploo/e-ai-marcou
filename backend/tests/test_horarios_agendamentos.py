@@ -13,9 +13,9 @@ from app.schemas.profissionais import ProfissionalResponse
 
 H = dict(profissionalId="prof-id", clinicaId="clinica-id", data="2026-10-20", hora="09:30", disponivel=True)
 P = dict(nome="Maria", crm="123", especialidadeId="esp-id", clinicaId="clinica-atual", valorConsulta=175.5, fotoUrl=None, ativo=True)
-A = dict(pacienteId="paciente-demo", horarioId="hor-id", **{k: v for k, v in H.items() if k != "disponivel"}, valor=175.5, status="agendado", criadoEm=datetime.now(timezone.utc))
+A = dict(paraQuem="mim", pacienteId="paciente-demo", horarioId="hor-id", **{k: v for k, v in H.items() if k != "disponivel"}, valor=175.5, status="agendado", criadoEm=datetime.now(timezone.utc))
 INPUT_H = {k: H[k] for k in ("profissionalId", "data", "hora")}
-INPUT_A = dict(pacienteId="paciente-demo", horarioId="hor-id")
+INPUT_A = dict(paraQuem="mim", pacienteId="paciente-demo", horarioId="hor-id")
 
 
 @pytest.fixture(autouse=True)

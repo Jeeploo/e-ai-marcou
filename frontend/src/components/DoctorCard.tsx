@@ -14,6 +14,12 @@ export default function DoctorCard({ doctor }: { doctor: Professional }) {
           <p>{doctor.clinic}</p>
         </div>
       </div>
+      <p>{doctor.address}</p>
+      <p>
+        {doctor.nextSlot
+          ? `Próximo horário: ${doctor.nextSlot.data.split("-").reverse().join("/")} às ${doctor.nextSlot.hora}`
+          : "Sem horários disponíveis"}
+      </p>
       <div className="doctor-meta">
         {Number.isFinite(doctor.rating) && (
           <span>

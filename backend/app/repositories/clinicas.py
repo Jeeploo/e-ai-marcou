@@ -10,11 +10,11 @@ class ClinicaRepository:
     def __init__(self, client: Client):
         self.client = client
 
-    def create(self, nome: str, endereco: str, cidade: str, uf: str, telefone: str | None, ativo: bool) -> ClinicaResponse:
+    def create(self, **data) -> ClinicaResponse:
         document = self.client.collection("clinicas").document()
-        data = {"nome": nome, "endereco": endereco, "cidade": cidade, "uf": uf, "telefone": telefone, "ativo": ativo}
-        document.set(data)
-        return ClinicaResponse(id=document.id, **data)
+        result = ClinicaResponse(id=document.id, **data)
+        document.set(result.model_dump(exclude={"id"}))
+        return result
 
     def list(self) -> list[ClinicaResponse]:
         documents = self.client.collection("clinicas").stream()

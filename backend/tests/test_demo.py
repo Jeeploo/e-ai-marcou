@@ -154,3 +154,16 @@ def test_demo_catalog_and_slot_creation(client):
 def test_health_in_both_modes(client, monkeypatch, mode):
     monkeypatch.setattr(config.settings, 'data_mode', mode)
     assert client.get('/api/health').status_code == 200
+
+
+def test_search_contract(client):
+    assert client.get('/api/profissionais/busca?latitude=0').status_code == 422
+    assert client.get('/api/profissionais/busca?latitude=91&longitude=0').status_code == 422
+    assert client.get('/api/profissionais/busca?ordem=invalido').status_code == 422
+    response = client.get('/api/profissionais/busca', params={'latitude':-8.11,'longitude':-34.89,'especialidadeId':'demo-especialidade-0','ordem':'distancia'})
+    assert response.status_code == 200
+    items = response.json()
+    assert len(items) == 4
+    assert [p['distanciaKm'] for p in items] == sorted(p['distanciaKm'] for p in items)
+    assert all(p['proximoHorario'] for p in items)
+    assert client.get('/api/profissionais/busca?q=naoexiste').json() == []

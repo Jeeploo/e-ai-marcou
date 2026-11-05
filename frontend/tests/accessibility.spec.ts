@@ -7,7 +7,7 @@ for (const width of [375, 1440]) {
       "/",
       "/busca",
       "/agenda",
-      "/profissional/ana",
+      "/profissional/demo-profissional-2",
       "/perfil/dados",
       "/perfil/notificacoes",
       "/perfil/enderecos",
@@ -59,8 +59,8 @@ test("modais, confirmação e teclado acessíveis", async ({ page }) => {
   await page.getByRole("button", { name: "Adicionar endereço" }).click();
   await audit();
   await page.keyboard.press("Escape");
-  await page.goto("/profissional/ana");
-  await page.getByRole("button", { name: "09:00", exact: true }).focus();
+  await page.goto("/profissional/demo-profissional-2");
+  await page.getByRole("button", { name: "09:30", exact: true }).focus();
   await page.keyboard.press("Enter");
   await page.getByRole("button", { name: "Avançar para agendamento" }).click();
   await audit();

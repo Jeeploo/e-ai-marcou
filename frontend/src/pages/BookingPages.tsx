@@ -1,3 +1,4 @@
+import { useSearchContext } from "../hooks/SearchContext";
 import ProfessionalAvatar from "../components/ProfessionalAvatar";
 import { useEffect, useState } from "react";
 import { Check, MapPin } from "lucide-react";
@@ -109,7 +110,8 @@ export function ProfessionalPage() {
           <p>{doctor.crm || "Consulte o CRM com a clínica"}</p>
           <h3 className="spaced-heading">Sobre o médico</h3>
           <p>
-            Entre em contato com a clínica para mais informações sobre o profissional.
+            Entre em contato com a clínica para mais informações sobre o
+            profissional.
           </p>
           <h3 className="spaced-heading">
             <MapPin size={19} className="inline-icon" /> {doctor.clinic}
@@ -209,6 +211,7 @@ export function ProfessionalPage() {
   );
 }
 export function ConfirmPage() {
+  const { paraQuem, setParaQuem } = useSearchContext();
   const [params] = useSearchParams(),
     navigate = useNavigate(),
     {
@@ -260,7 +263,7 @@ export function ConfirmPage() {
     try {
       reschedule
         ? await bookingService.reschedule(reschedule, slot.id)
-        : await bookingService.create(slot.id);
+        : await bookingService.create(slot.id, paraQuem);
       setSuccess(true);
     } catch (e) {
       if (e instanceof ApiError && e.status === 409) setSlot(undefined);
@@ -309,6 +312,18 @@ export function ConfirmPage() {
           <>
             <section className="receipt">
               <h2>Resumo</h2>
+              <label>
+                Para quem é esta consulta?
+                <select
+                  value={paraQuem}
+                  onChange={(e) =>
+                    setParaQuem(e.target.value as "mim" | "outra_pessoa")
+                  }
+                >
+                  <option value="mim">Para mim</option>
+                  <option value="outra_pessoa">Para outra pessoa</option>
+                </select>
+              </label>
               <dl>
                 <div>
                   <dt>Data</dt>

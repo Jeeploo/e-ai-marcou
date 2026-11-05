@@ -9,6 +9,7 @@ import {
 import type { Professional } from "../data/catalog";
 import { catalogApi, friendlyError } from "../services/api";
 interface Catalog {
+  specialtyOptions: { id: string; nome: string }[];
   professionals: Professional[];
   specialties: string[];
   loading: boolean;
@@ -17,6 +18,9 @@ interface Catalog {
 }
 const Context = createContext<Catalog | null>(null);
 export function CatalogProvider({ children }: { children: ReactNode }) {
+  const [specialtyOptions, setSpecialtyOptions] = useState<
+    { id: string; nome: string }[]
+  >([]);
   const [professionals, setProfessionals] = useState<Professional[]>([]),
     [specialties, setSpecialties] = useState<string[]>([]),
     [loading, setLoading] = useState(true),
@@ -69,6 +73,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
                 .join(""),
             };
           });
+        setSpecialtyOptions(specs);
         setProfessionals(mapped);
         setSpecialties(specs.map((s) => s.nome));
       })
@@ -85,6 +90,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   return (
     <Context.Provider
       value={{
+        specialtyOptions,
         professionals,
         specialties,
         loading,

@@ -1,3 +1,5 @@
+import SearchReference from "../components/SearchReference";
+import { useProfessionalSearch } from "../hooks/useProfessionalSearch";
 import { useEffect, useState } from "react";
 import {
   Bone,
@@ -42,6 +44,7 @@ const fallbackSpecialtyVisual = {
 };
 
 export default function HomePage() {
+  const nearby = useProfessionalSearch();
   const { professionals, specialties, loading, error, reload } = useCatalog(),
     { profile } = useProfile(),
     [next, setNext] = useState<Appointment>(),
@@ -192,11 +195,13 @@ export default function HomePage() {
             </section>
             <section aria-labelledby="nearby-title">
               <div className="section-heading">
-                <h2 id="nearby-title">Clínicas próximas</h2>
+                <h2 id="nearby-title">Profissionais recomendados</h2>
                 <Link to="/busca">Ver todas</Link>
               </div>
+              <SearchReference />
+              {nearby.error && <p role="alert">{nearby.error}</p>}
               <div className="doctor-grid home-doctors">
-                {professionals.slice(0, 3).map((doctor) => (
+                {nearby.items.slice(0, 3).map((doctor) => (
                   <DoctorCard key={doctor.id} doctor={doctor} />
                 ))}
               </div>

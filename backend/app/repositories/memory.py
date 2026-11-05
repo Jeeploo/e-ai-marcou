@@ -2,6 +2,7 @@
 import hashlib
 import json
 from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 from threading import RLock
 from uuid import uuid4
 
@@ -30,30 +31,20 @@ class MemoryStore:
         self._seed()
 
     def _seed(self):
-        for index, specialty in enumerate(["Cardiologia", "Dermatologia", "Ortopedia", "Clínica Geral"]):
-            MemoryRepository(self, "especialidades").create(
-                id=f"demo-especialidade-{index}", nome=specialty,
-                descricao=f"Atendimento em {specialty.lower()}", ativo=True,
-            )
-        for index, name in enumerate(["Clínica Boa Saúde", "Centro Médico Recife"]):
-            MemoryRepository(self, "clinicas").create(
-                id=f"demo-clinica-{index}", nome=name, endereco=f"Av. Boa Saúde, {100 + index}",
-                cidade="Recife", uf="PE", telefone="(81) 3333-1000", ativo=True,
-            )
-        for index, name in enumerate(["Dra. Ana Souza", "Dr. Lucas Martins", "Dra. Juliana Lima", "Dr. Rafael Costa", "Dra. Mariana Alves", "Dr. Pedro Henrique", "Dra. Camila Rocha", "Dr. Bruno Silva"]):
-            professional = MemoryRepository(self, "profissionais").create(
-                id=f"demo-profissional-{index}", nome=name, crm=f"CRM-PE {21000 + index}",
-                especialidadeId=f"demo-especialidade-{index // 2}", clinicaId=f"demo-clinica-{index % 2}",
-                valorConsulta=140 + index * 20, fotoUrl=None, ativo=True,
-            )
+        from app.demo_catalog import catalog
+        data = catalog()
+        for collection, records in data.items():
+            for record in records:
+                MemoryRepository(self, collection).create(**record)
+        for professional in MemoryRepository(self, "profissionais").list():
             for offset in range(15):
                 for time in ["08:30", "09:30", "10:30", "14:00", "15:30", "17:00"]:
                     MemoryHorarioRepository(self).create(
                         profissionalId=professional.id, clinicaId=professional.clinicaId,
-                        data=(date.today() + timedelta(days=offset)).isoformat(), hora=time, disponivel=True,
+                        data=(datetime.now(ZoneInfo("America/Recife")).date() + timedelta(days=offset)).isoformat(), hora=time, disponivel=True,
                     )
         repository = MemoryAgendamentoRepository(self)
-        tomorrow = (date.today() + timedelta(days=1)).isoformat()
+        tomorrow = (datetime.now(ZoneInfo("America/Recife")).date() + timedelta(days=1)).isoformat()
         slots = MemoryHorarioRepository(self).list(profissionalId="demo-profissional-0", data=tomorrow)
         repository.create("paciente-demo", slots[0].id)
         history = repository.create("paciente-demo", slots[1].id)
@@ -117,10 +108,10 @@ class MemoryAgendamentoRepository(MemoryRepository):
                     clinicaId=horario.clinicaId, data=horario.data, hora=horario.hora,
                     valor=professional.valorConsulta)
 
-    def create(self, pacienteId, horarioId):
+    def create(self, pacienteId, horarioId, paraQuem="mim"):
         with self.store.lock:
             payload = self._reservation(horarioId)
-            result = super().create(pacienteId=pacienteId, **payload, status="agendado",
+            result = super().create(pacienteId=pacienteId, paraQuem=paraQuem, **payload, status="agendado",
                                     criadoEm=datetime.now(timezone.utc))
             self.store.collections["horarios"][horarioId].disponivel = False
             return result

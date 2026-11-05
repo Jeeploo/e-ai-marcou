@@ -6,6 +6,7 @@ export interface Slot {
   disponivel: boolean;
 }
 export interface Appointment {
+  paraQuem?: "mim" | "outra_pessoa";
   id: string;
   pacienteId: string;
   profissionalId: string;
@@ -16,6 +17,9 @@ export interface Appointment {
   status: "agendado" | "cancelado" | "concluido";
 }
 export interface Address {
+  nome?: string;
+  latitude?: number;
+  longitude?: number;
   id: string;
   cep: string;
   rua: string;

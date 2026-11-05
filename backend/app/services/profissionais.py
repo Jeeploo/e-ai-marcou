@@ -7,6 +7,8 @@ from app.schemas.especialidades import EspecialidadeResponse
 from app.schemas.clinicas import ClinicaResponse
 from app.repositories.clinicas import get_clinica_repository
 from app.repositories.especialidades import get_especialidade_repository
+from app.repositories.horarios import get_horario_repository
+from app.repositories.contracts import HorarioDataRepository
 from app.repositories.profissionais import get_profissional_repository
 from app.schemas.profissionais import ProfissionalCreate, ProfissionalResponse
 
@@ -17,7 +19,9 @@ class ProfissionalService:
         repository: CatalogRepository[ProfissionalResponse],
         especialidade_repository: CatalogRepository[EspecialidadeResponse],
         clinica_repository: CatalogRepository[ClinicaResponse],
+        horario_repository=None,
     ):
+        self.horario_repository = horario_repository
         self.repository = repository
         self.especialidade_repository = especialidade_repository
         self.clinica_repository = clinica_repository
@@ -36,6 +40,12 @@ class ProfissionalService:
                 detail="Clínica não existe ou está inativa",
             )
         return self.repository.create(**profissional.model_dump(), ativo=True)
+
+    def search(self, latitude, longitude, ordem, especialidadeId, q, valorMaximo):
+        from app.services.busca import search
+        return search(self.repository.list(), self.clinica_repository.list(),
+                      self.especialidade_repository.list(), (self.horario_repository or get_horario_repository()).list(disponivel=True),
+                      latitude, longitude, ordem, especialidadeId, q, valorMaximo)
 
     def list(self) -> list[ProfissionalResponse]:
         return self.repository.list()

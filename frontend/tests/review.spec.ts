@@ -29,14 +29,10 @@ test("CEP preenche endereço e permite corrigir campos", async ({ page }) => {
     page.getByRole("textbox", { name: "Cidade", exact: true }),
   ).toHaveValue("São Paulo");
 });
-test("mapa Google acompanha a clínica selecionada", async ({ page }) => {
+test("busca usa lista sem mapas externos", async ({ page }) => {
   await page.goto("/busca?visualizacao=mapa");
-  await expect(page.locator(".region-map")).toHaveAttribute(
-    "src",
-    /www.google.com\/maps\?q=/,
-  );
-  await page.getByRole("button", { name: "Mostrar no mapa" }).nth(1).click();
-  await expect(page).toHaveURL(/destaque=/);
+  await expect(page.getByLabel("Ordenar por")).toBeVisible();
+  await expect(page.locator("iframe")).toHaveCount(0);
 });
 test("inspeção visual, console e critérios de instalação", async () => {
   const dir = await mkdtemp(join(tmpdir(), "marcou-pwa-"));
@@ -61,7 +57,7 @@ test("inspeção visual, console e critérios de instalação", async () => {
       for (const route of [
         "/",
         "/busca?visualizacao=mapa",
-        "/profissional/ana",
+        "/profissional/demo-profissional-1",
         "/agenda",
         "/perfil/dados",
       ]) {

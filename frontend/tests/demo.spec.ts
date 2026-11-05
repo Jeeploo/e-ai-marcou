@@ -5,8 +5,15 @@ test("API demo real: filtrar, agendar, remarcar e cancelar com histórico", asyn
   request,
 }) => {
   await page.goto("/busca?especialidade=Cardiologia");
-  await expect(page.locator(".doctor-card")).toHaveCount(2);
-  await page.goto("/profissional/demo-profissional-1");
+  await expect(page.locator(".doctor-card")).toHaveCount(4);
+  await page
+    .getByLabel("Para quem é esta consulta?")
+    .selectOption("outra_pessoa");
+  await page
+    .locator(".doctor-card")
+    .filter({ hasText: "Lucas Martins" })
+    .getByRole("link", { name: "Ver horários" })
+    .click();
   await page.getByRole("button", { name: "09:30", exact: true }).click();
   await page.getByRole("button", { name: "Avançar para agendamento" }).click();
   await page
@@ -21,6 +28,7 @@ test("API demo real: filtrar, agendar, remarcar e cancelar com histórico", asyn
       )
     ).json();
   const [created] = await read();
+  expect(created.paraQuem).toBe("outra_pessoa");
   const duplicate = await request.post(
     "http://127.0.0.1:8001/api/agendamentos",
     { data: { pacienteId: "outro", horarioId: created.horarioId } },
