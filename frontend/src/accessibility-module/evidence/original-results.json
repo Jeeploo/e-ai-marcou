@@ -1,0 +1,88 @@
+[
+  {
+    "name": "abrir/fechar por Enter, Space e Escape com retorno de foco",
+    "status": "PASS"
+  },
+  {
+    "name": "Tab/Shift+Tab permanecem no painel modal",
+    "status": "FAIL",
+    "message": "Foco escapou do painel  false !== true "
+  },
+  {
+    "name": "submenu inativo não recebe foco",
+    "status": "FAIL",
+    "message": "Menu principal oculto recebeu foco"
+  },
+  {
+    "name": "persistência após recarga e reset persistido",
+    "status": "FAIL",
+    "message": "Expected values to be strictly equal:  100 !== 150 "
+  },
+  {
+    "name": "fontes px e rem ampliam uma única vez até 200%",
+    "status": "FAIL",
+    "message": "0: 16 → 16"
+  },
+  {
+    "name": "escala da página aplica uma vez fora do painel",
+    "status": "FAIL",
+    "message": "Expected values to be strictly equal:  '1.5' !== '1' "
+  },
+  {
+    "name": "mídia inicialmente silenciada preservada ao ativar/desativar",
+    "status": "FAIL",
+    "message": "Expected values to be strictly equal:  false !== true "
+  },
+  {
+    "name": "preferência nativa de movimento respeitada sem botão",
+    "status": "FAIL",
+    "message": "The expression evaluated to a falsy value:    assert(parseFloat(await p.locator('#moving').evaluate(e=>getComputedStyle(e).animationDuration))<0.01) "
+  },
+  {
+    "name": "modos de cores sem matriz científica não fundamentada",
+    "status": "FAIL",
+    "message": "The expression evaluated to a falsy value:    assert(!await p.evaluate(()=>getComputedStyle(document.documentElement).filter.includes('url('))) "
+  },
+  {
+    "name": "valores da store validados em runtime",
+    "status": "FAIL",
+    "message": "Expected values to be strictly equal:  999 !== 200 "
+  },
+  {
+    "name": "perfis e filtros combinam, alternam e resetam",
+    "status": "PASS"
+  },
+  {
+    "name": "combinações visuais e guias aplicam/desativam sem overflow",
+    "status": "PASS"
+  },
+  {
+    "name": "navegação preserva preferências e filtros",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 320px",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 390px",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 768px",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 1024px",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 1440px",
+    "status": "PASS"
+  },
+  {
+    "name": "axe: painel e todos os submenus sem violações WCAG A/AA",
+    "status": "FAIL",
+    "message": "Expected values to be strictly deep-equal: + actual - expected  + [ +   {"
+  }
+]

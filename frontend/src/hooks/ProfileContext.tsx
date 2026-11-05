@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Profile } from "../types/models";
+import { useAccessibilityStore } from "../accessibility-module";
 const initial: Profile = {
   patient: {
     nome: "Lucas Ferreira",
@@ -43,10 +44,31 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       return initial;
     }
   });
+  const textSize = useAccessibilityStore((state) => state.textSize);
   useEffect(() => {
-    document.documentElement.dataset.textSize = profile.textSize;
-  }, [profile.textSize]);
+    // The widget hydrates the new preferences before this parent effect runs.
+    // Only migrate the legacy preference when no new record exists.
+    try {
+      if (
+        !localStorage.getItem("marcou:a11y:v1") &&
+        profile.textSize === "large"
+      ) {
+        useAccessibilityStore.getState().updateValue("textSize", 125);
+      }
+    } catch {
+      // Storage restrictions must not prevent using the controls in memory.
+    }
+  }, []);
+  const currentProfile: Profile = {
+    ...profile,
+    textSize: textSize > 100 ? "large" : "normal",
+  };
   const save = (next: Profile) => {
+    if (next.textSize !== currentProfile.textSize) {
+      useAccessibilityStore
+        .getState()
+        .updateValue("textSize", next.textSize === "large" ? 125 : 100);
+    }
     setProfile(next);
     try {
       sessionStorage.setItem("marcou:profile", JSON.stringify(next));
@@ -55,7 +77,9 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     }
   };
   return (
-    <Context.Provider value={{ profile, save }}>{children}</Context.Provider>
+    <Context.Provider value={{ profile: currentProfile, save }}>
+      {children}
+    </Context.Provider>
   );
 }
 export function useProfile() {

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/app";
 import AxeBuilder from "@axe-core/playwright";
 for (const width of [375, 1440]) {
   test(`acessibilidade WCAG em ${width}px`, async ({ page }) => {
@@ -7,7 +7,7 @@ for (const width of [375, 1440]) {
       "/",
       "/busca",
       "/agenda",
-      "/profissional/demo-profissional-2",
+      "/profissional/mario",
       "/perfil/dados",
       "/perfil/notificacoes",
       "/perfil/enderecos",
@@ -59,8 +59,8 @@ test("modais, confirmação e teclado acessíveis", async ({ page }) => {
   await page.getByRole("button", { name: "Adicionar endereço" }).click();
   await audit();
   await page.keyboard.press("Escape");
-  await page.goto("/profissional/demo-profissional-2");
-  await page.getByRole("button", { name: "09:30", exact: true }).focus();
+  await page.goto("/profissional/mario");
+  await page.getByRole("button", { name: "09:00", exact: true }).focus();
   await page.keyboard.press("Enter");
   await page.getByRole("button", { name: "Avançar para agendamento" }).click();
   await audit();
@@ -68,5 +68,7 @@ test("modais, confirmação e teclado acessíveis", async ({ page }) => {
     .getByRole("button", { name: "Confirmar agendamento", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toBeVisible();
+  // Audit the interactive hover state as well as the modal's default state.
+  await page.getByRole("link", { name: "Ver minhas consultas" }).hover();
   await audit();
 });

@@ -1,0 +1,13 @@
+{
+  "components/AccessibilityWidget.tsx": "831f99e034b657e562a5569e329a07d8f4414988872fa9a2562858bd09482dbc",
+  "components/VLibrasWidget.tsx": "13914276c81ae30ce1de347b3b93ec2f8a0f8089e89149d444db33969d769438",
+  "store/useAccessibilityStore.ts": "9bd3833cec0f2604faf7778e9689fed3cc78d5fae78deaeca8ac1d1775ace552",
+  "app/globals.css": "af1c0578db909a3b1a2f53d04c34b09ebaf3c0487f3397f49ab93f97decd03c8",
+  "app/layout.tsx": "449d1a99f54e0aece16da9917405c7a8bac33ac51944a54ebb947fd7d4974d49",
+  "app/login/page.tsx": "d92ddf63a37c2fd8c0f204260f0d73c734e0cfd773903e84f971de3c55e1e88d",
+  "app/sobre_cliente/page.tsx": "ad5aae37068af3db4502290232f02f0ef712ea132cc50d74febcc1586ec197c7",
+  "app/sobre_cliente/JaspeCoin.tsx": "692b4b8daa375e52de24493487073c5e0e519fe1a3c242a027acbde4776f73d0",
+  "app/sobre_cliente/badge.module.css": "5c88089510eb0d16bc734a854e18bdb40d55489e91f8d389c0fc5ba823ef9ae5",
+  "lib/supabase.ts": "c908f94e27730a1b636f6abfd0e0bbc6f5b0e10c441a6f27a805b23485c5bc6c",
+  "package.json": "e4ebb35c2b99c15b786a8d649585a4ea1dec793e829a0f842786de255120638e"
+}

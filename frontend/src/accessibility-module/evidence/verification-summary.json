@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-05",
+  "source_files_unchanged": 11,
+  "portable_sources_identical_to_vite_copy": 7,
+  "store_and_ssr_tests": {
+    "passed": 6,
+    "failed": 0
+  },
+  "browser_portable": {
+    "passed": 31,
+    "failed": 0,
+    "runs": "30 cenários completos + 1 cenário adicional de voz"
+  },
+  "browser_vite": {
+    "passed": 31,
+    "failed": 0,
+    "runs": "30 cenários completos + 1 cenário adicional de voz"
+  },
+  "delivered_smoke": {
+    "viewports": [
+      "320x568",
+      "1440x900"
+    ],
+    "passed": 2
+  },
+  "original_test_suite": {
+    "passed": 137,
+    "skipped": 1,
+    "failed": 0
+  },
+  "original_default_build": "TurbopackInternalError: processo de transformação CSS encerrou antes da conexão",
+  "original_alternative_build": "next build --webpack, exit 0",
+  "vite_build": "tsc --noEmit && vite build, exit 0; aviso use client/sourcemap não fatal",
+  "axe": "4.12.1",
+  "playwright": "1.62.1",
+  "external_not_validated": [
+    "voz audível",
+    "VLibras remoto",
+    "leitor de tela humano",
+    "aplicação completa do grupo"
+  ],
+  "next_isolated_build": "Next 16.4.3: Server Layout + módulo, TypeScript e geração estática; next build --webpack exit 0; hook marcado use client após falha reproduzida"
+}

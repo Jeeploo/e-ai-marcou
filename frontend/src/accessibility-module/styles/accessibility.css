@@ -1,0 +1,67 @@
+/* Importar após o Tailwind e o CSS da aplicação. Conteúdo e painel são irmãos. */
+[data-a11y-content] {
+  filter: var(--a11y-filter, none);
+  zoom: var(--a11y-page-scale, 1);
+}
+.a11y-custom-cursor [data-a11y-content], .a11y-custom-cursor [data-a11y-content] * { cursor: var(--a11y-cursor); }
+.a11y-text-align [data-a11y-content], .a11y-text-align [data-a11y-content] * { text-align: var(--a11y-text-align) !important; }
+.a11y-text-active [data-a11y-content] * {
+  line-height: var(--a11y-line-height, 1.5) !important;
+  letter-spacing: var(--a11y-letter-spacing, 0px) !important;
+  word-spacing: var(--a11y-word-spacing, 0px) !important;
+}
+.a11y-dyslexia [data-a11y-content] * { font-family: 'Comic Sans MS', 'OpenDyslexic', sans-serif !important; }
+.a11y-legible [data-a11y-content] * { font-family: Arial, Helvetica, sans-serif !important; }
+.a11y-reading-mode [data-a11y-content],
+.a11y-reading-mode [data-a11y-content] :is(main,section,article,p,h1,h2,h3,h4,label) {
+  background-color: #fdf6e3 !important; color: #1a1a1a !important; background-image: none !important;
+}
+.a11y-reading-mode [data-a11y-content] a { color: #075985 !important; text-decoration: underline !important; }
+/* Os três modos apoiam distinção sem depender só de cor. Não são simulação
+   nem algoritmo de daltonização; não alteram cores por matrizes arbitrárias. */
+.a11y-color-support [data-a11y-content] a[href] { text-decoration: underline !important; text-decoration-thickness: 2px !important; text-underline-offset: 3px !important; }
+.a11y-color-support [data-a11y-content] :is(button,[role='button']) { border: 2px solid currentColor !important; }
+.a11y-color-support [data-a11y-content] [role='alert'] { border-inline-start: 5px solid currentColor; background-image: repeating-linear-gradient(45deg, #80808018 0 5px, transparent 5px 10px); }
+.a11y-highlight-links [data-a11y-content] a[href] { outline: 3px solid #a16207 !important; outline-offset: 3px !important; }
+.a11y-highlight-buttons [data-a11y-content] button { outline: 3px solid #be123c !important; outline-offset: 3px !important; }
+.a11y-highlight-titles [data-a11y-content] :is(h1,h2,h3,h4,h5,h6) { outline: 3px dashed #0f766e !important; outline-offset: 3px !important; }
+.a11y-hover-focus [data-a11y-content] :is(a,button,input,select,textarea,[tabindex]):hover { outline: 3px dashed #0f766e !important; outline-offset: 3px !important; }
+.a11y-keyboard-tips [data-a11y-content] :focus-visible { outline: 3px solid #a16207 !important; outline-offset: 3px !important; }
+/* Oculta visualmente, preservando a alternativa semântica para leitores. */
+.a11y-hide-images [data-a11y-content] img:not(a img,button img,[role='button'] img),
+.a11y-hide-images [data-a11y-content] video:not([controls]) { opacity: 0 !important; }
+.a11y-hide-images [data-a11y-content] :is(main,section,article) { background-image: none !important; }
+.a11y-pause-animations [data-a11y-content] *,
+.a11y-pause-animations [data-a11y-content] *::before,
+.a11y-pause-animations [data-a11y-content] *::after { animation-play-state: paused !important; }
+.a11y-reduce-motion [data-a11y-content] *,
+.a11y-reduce-motion [data-a11y-content] *::before,
+.a11y-reduce-motion [data-a11y-content] *::after,
+.a11y-reduce-motion #a11y-widget-root *,
+.a11y-reduce-motion #a11y-panel * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  [data-a11y-content] *, [data-a11y-content] *::before, [data-a11y-content] *::after,
+  #a11y-widget-root *, #a11y-panel * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+@media (prefers-contrast: more) {
+  [data-a11y-content] :is(a,button,input,select,textarea) { outline-offset: 3px; border-width: 2px; }
+  [data-a11y-content] a { text-decoration: underline; }
+}
+@media (forced-colors: active) {
+  [data-a11y-content] { filter: none; }
+  #a11y-panel, #a11y-panel button, #a11y-panel input { forced-color-adjust: auto; }
+  #a11y-panel :focus-visible { outline: 3px solid Highlight !important; }
+}
+#a11y-panel { margin: 0; padding: 0; color: #1e293b; height: min(85dvh, 680px); }
+#a11y-panel:not([open]) { display: none !important; }
+#a11y-panel::backdrop { background: #0f172a26; }
+#a11y-panel button { min-height: 44px; }
+#a11y-panel :is(button,input):focus-visible,
+#a11y-widget-root button:focus-visible { outline: 3px solid #047857; outline-offset: 3px; }
+#a11y-panel .a11y-no-scrollbar::-webkit-scrollbar { display: none; }
+#a11y-panel .a11y-no-scrollbar { scrollbar-width: none; }
+.a11y-custom-slider { appearance: none; min-height: 24px; }
+.a11y-custom-slider::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: white; border: 2px solid #047857; border-radius: 50%; cursor: pointer; }
+.a11y-custom-slider::-moz-range-thumb { width: 22px; height: 22px; background: white; border: 2px solid #047857; border-radius: 50%; cursor: pointer; }
+.a11y-reading-highlight { outline: 3px solid #047857 !important; outline-offset: 3px !important; }
