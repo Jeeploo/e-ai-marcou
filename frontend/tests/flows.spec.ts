@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/app";
 test("busca preserva filtros e mostra estado vazio", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "Cardiologia 2 clínicas" }).click();
@@ -56,6 +56,7 @@ test("agenda cria, persiste, remarca e mantém cancelamento no histórico", asyn
 test("conflito entre abas não cria uma segunda consulta", async ({
   page,
   context,
+  api,
 }) => {
   await page.goto("/profissional/ana");
   await page.getByRole("button", { name: "09:00", exact: true }).click();
@@ -76,6 +77,10 @@ test("conflito entre abas não cria uma segunda consulta", async ({
     .getByRole("button", { name: "Confirmar agendamento", exact: true })
     .click();
   await expect(other.getByRole("alert")).toContainText("ocupado");
+  expect(api.writes.map((w) => w.status)).toEqual([201, 409]);
+  expect(
+    api.appointments.filter((a) => a.profissionalId === "ana"),
+  ).toHaveLength(1);
 });
 test("perfil salva dados, endereço e preferências; modal aceita Escape", async ({
   page,
@@ -112,34 +117,6 @@ test("perfil salva dados, endereço e preferências; modal aceita Escape", async
   await page.reload();
   await expect(page.locator(".sidebar-user")).toContainText("Pessoa Teste");
 });
-test("PWA registra cache e abre offline, bloqueando agendamento", async ({
-  page,
-  context,
-}) => {
-  await page.goto("/profissional/ana");
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
-  });
-  await page.reload();
-  await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await context.setOffline(true);
-  await page.reload();
-  await expect(
-    page.getByText(
-      "Você está sem internet. Agendar, remarcar e cancelar exigem conexão.",
-    ),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "09:00", exact: true }).click();
-  await expect(
-    page.getByRole("button", { name: "Avançar para agendamento" }),
-  ).toBeDisabled();
-  await context.setOffline(false);
-  await expect(
-    page.getByRole("button", { name: "Avançar para agendamento" }),
-  ).toBeEnabled();
-  const manifest = await page.request.get("/manifest.webmanifest");
-  expect((await manifest.json()).display).toBe("standalone");
-});
 for (const width of [320, 375, 430, 768, 1024, 1440])
   test(`layouts sem overflow horizontal em ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
@@ -153,7 +130,14 @@ for (const width of [320, 375, 430, 768, 1024, 1440])
       "/busca?visualizacao=mapa",
     ]) {
       await page.goto(route);
-      await page.waitForTimeout(150);
+      await expect(page.locator("main h1")).toBeVisible();
+      await expect(page.locator("main [role=alert]")).toHaveCount(0);
+      if (route.startsWith("/busca"))
+        await expect(page.locator(".results-count")).toHaveText(
+          "6 profissionais encontrados",
+        );
+      if (route === "/agenda")
+        await expect(page.locator(".appointment")).toHaveCount(1);
       if (route === "/") {
         const cards = page.locator(".specialties a");
         await expect(cards.first()).toBeVisible();

@@ -1,0 +1,126 @@
+[
+  {
+    "name": "abrir/fechar por Enter, Space e Escape com retorno de foco",
+    "status": "PASS"
+  },
+  {
+    "name": "Tab/Shift+Tab permanecem no painel modal",
+    "status": "PASS"
+  },
+  {
+    "name": "submenu inativo nÃ£o recebe foco",
+    "status": "PASS"
+  },
+  {
+    "name": "persistÃªncia apÃ³s recarga e reset persistido",
+    "status": "PASS"
+  },
+  {
+    "name": "fontes px e rem ampliam uma Ãºnica vez atÃ© 200%",
+    "status": "PASS"
+  },
+  {
+    "name": "escala da pÃ¡gina aplica uma vez fora do painel",
+    "status": "PASS"
+  },
+  {
+    "name": "mÃ­dia inicialmente silenciada preservada ao ativar/desativar",
+    "status": "PASS"
+  },
+  {
+    "name": "preferÃªncia nativa de movimento respeitada sem botÃ£o",
+    "status": "PASS"
+  },
+  {
+    "name": "modos de cores sem matriz cientÃ­fica nÃ£o fundamentada",
+    "status": "PASS"
+  },
+  {
+    "name": "valores da store validados em runtime",
+    "status": "PASS"
+  },
+  {
+    "name": "perfis e filtros combinam, alternam e resetam",
+    "status": "PASS"
+  },
+  {
+    "name": "combinaÃ§Ãµes visuais e guias aplicam/desativam sem overflow",
+    "status": "PASS"
+  },
+  {
+    "name": "navegaÃ§Ã£o preserva preferÃªncias e filtros",
+    "status": "PASS"
+  },
+  {
+    "name": "todas as seis posiÃ§Ãµes mantÃªm botÃ£o e painel dentro da tela",
+    "status": "PASS"
+  },
+  {
+    "name": "armazenamento bloqueado e JSON corrompido mantÃªm controles utilizÃ¡veis",
+    "status": "PASS"
+  },
+  {
+    "name": "preferÃªncias nativas de contraste e forced-colors nÃ£o usam filtro",
+    "status": "PASS"
+  },
+  {
+    "name": "todos os ajustes visuais aplicam e restauram estilos",
+    "status": "PASS"
+  },
+  {
+    "name": "radios nativos usam setas e todos os perfis podem ser alternados",
+    "status": "PASS"
+  },
+  {
+    "name": "voz indisponÃ­vel exibe aviso sem erro",
+    "status": "PASS"
+  },
+  {
+    "name": "leitura ignora texto oculto, links mantÃªm aÃ§Ã£o e reset cancela voz",
+    "status": "PASS"
+  },
+  {
+    "name": "ocultaÃ§Ã£o mantÃ©m vÃ­deo com controles e imagem em link visÃ­veis",
+    "status": "PASS"
+  },
+  {
+    "name": "desmontagem restaura tipografia, classes e mÃ­dias",
+    "status": "PASS"
+  },
+  {
+    "name": "tela baixa 320x568: reset e fechar visÃ­veis",
+    "status": "PASS"
+  },
+  {
+    "name": "tela baixa 740x360: reset e fechar visÃ­veis",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 320px",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 390px",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 768px",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 1024px",
+    "status": "PASS"
+  },
+  {
+    "name": "painel responsivo em 1440px",
+    "status": "PASS"
+  },
+  {
+    "name": "axe: painel e todos os submenus sem violaÃ§Ãµes WCAG A/AA",
+    "status": "PASS"
+  },
+  {
+    "name": "seleÃ§Ã£o, velocidade, pausa, retomada e parada da voz",
+    "status": "PASS"
+  }
+]

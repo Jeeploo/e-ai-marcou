@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/app";
 import AxeBuilder from "@axe-core/playwright";
 for (const width of [375, 1440]) {
   test(`acessibilidade WCAG em ${width}px`, async ({ page }) => {
@@ -68,5 +68,7 @@ test("modais, confirmação e teclado acessíveis", async ({ page }) => {
     .getByRole("button", { name: "Confirmar agendamento", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toBeVisible();
+  // Audit the interactive hover state as well as the modal's default state.
+  await page.getByRole("link", { name: "Ver minhas consultas" }).hover();
   await audit();
 });

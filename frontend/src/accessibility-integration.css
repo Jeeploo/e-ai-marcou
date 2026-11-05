@@ -1,0 +1,39 @@
+/* Filter each visual region without making the fixed navigation's parent a
+   containing block. Native dialogs stay in the browser's top layer. */
+[data-a11y-content] {
+  filter: none;
+}
+[data-a11y-content] :is(main, .sidebar, .signed-out) {
+  filter: var(--a11y-filter, none);
+}
+/* Leave the desktop navigation available beside the default left trigger. */
+@media (min-width: 761px) {
+  #a11y-widget-root > button.left-0 {
+    left: 212px;
+  }
+}
+/* Bottom positions must clear the mobile navigation and device safe area. */
+@media (max-width: 760px) {
+  #a11y-widget-root {
+    --marcou-a11y-bottom: max(
+      calc(104px * var(--a11y-page-scale, 1)),
+      calc(80px * var(--a11y-page-scale, 1) + env(safe-area-inset-bottom))
+    );
+  }
+  #a11y-widget-root > button.bottom-10,
+  #a11y-panel.bottom-10 {
+    bottom: var(--marcou-a11y-bottom);
+  }
+  #a11y-panel.bottom-10 {
+    max-height: min(85dvh, calc(100dvh - var(--marcou-a11y-bottom) - 16px));
+  }
+}
+@media (forced-colors: active) {
+  [data-a11y-content] :is(main, .sidebar, .signed-out) {
+    filter: none;
+  }
+}
+/* The app's unlayered p rule otherwise overrides the Tailwind header color. */
+#a11y-panel > div:first-child p {
+  color: #a7f3d0;
+}

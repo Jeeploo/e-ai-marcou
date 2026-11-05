@@ -1,0 +1,1312 @@
+Quero que você faça agora uma tarefa específica dentro DESTE MESMO PROJETO que já está sendo desenvolvido e analisado nesta conversa.
+
+IMPORTANTE:
+
+- Não quero que você crie um novo sistema de acessibilidade do zero.
+- Não quero que você imagine como ele poderia estar estruturado.
+- Quero que você analise a implementação REAL, ATUAL e EXISTENTE neste projeto.
+- Use todo o contexto anterior desta conversa e o estado atual do repositório.
+- Não descarte o que já foi implementado.
+- Não altere desnecessariamente outras partes do sistema.
+- Não faça mudanças visuais grandes sem necessidade.
+- Primeiro investigue, depois revise, depois prepare a exportação.
+
+# CONTEXTO
+
+Este projeto já possui um sistema de acessibilidade com um botão/menu de acessibilidade e diferentes funcionalidades.
+
+Tenho OUTRO projeto sendo desenvolvido em grupo e quero reaproveitar nele esse mesmo sistema.
+
+O outro projeto também utiliza tecnologias compatíveis com React + TypeScript.
+
+Quero enviar esse sistema para um amigo do grupo que será responsável por integrar a acessibilidade no outro projeto.
+
+Minha dúvida é justamente esta:
+
+**Existe um único arquivo que contém tudo do botão de acessibilidade ou o sistema depende de vários arquivos, componentes, stores, estilos, funções e integrações?**
+
+Quero que você descubra isso analisando o projeto de verdade.
+
+Depois, quero que você prepare da MELHOR FORMA POSSÍVEL tudo que precisa ser enviado para esse outro desenvolvedor.
+
+Preferencialmente, quero terminar esta tarefa com um arquivo `.zip` organizado contendo TODO o sistema de acessibilidade necessário, além de documentação clara de instalação e integração.
+
+---
+
+# 1. OBJETIVO PRINCIPAL
+
+Transforme o sistema de acessibilidade atual deste projeto em um **PACOTE PORTÁTIL, ORGANIZADO, DOCUMENTADO E REUTILIZÁVEL**.
+
+Esse pacote deve permitir que outro desenvolvedor consiga integrar a funcionalidade em outro projeto React + TypeScript sem precisar adivinhar:
+
+- quais arquivos são necessários;
+- quais arquivos são opcionais;
+- quais dependências instalar;
+- onde colocar cada arquivo;
+- quais imports adicionar;
+- qual componente renderizar;
+- onde renderizar;
+- se precisa de Provider;
+- se precisa de Store;
+- se precisa de Zustand;
+- se precisa de CSS global;
+- se precisa alterar `App.tsx`;
+- se precisa alterar `main.tsx`;
+- se precisa alterar layout;
+- se precisa alterar `html` ou `body`;
+- como funciona o estado;
+- como funciona a persistência;
+- como restaurar as configurações;
+- quais funcionalidades estão incluídas;
+- como testar;
+- quais pontos precisam ser adaptados para o outro projeto.
+
+O objetivo é que o meu amigo consiga receber esse pacote e entender exatamente como integrar.
+
+---
+
+# 2. NÃO PRESUMA QUE “O BOTÃO” É UM ÚNICO ARQUIVO
+
+Muito importante:
+
+Não trate essa funcionalidade simplesmente como um botão visual.
+
+Pode existir algo como:
+
+```text
+AccessibilityWidget.tsx
+        ↓
+AccessibilityPanel.tsx
+        ↓
+useAccessibilityStore.ts
+        ↓
+accessibility-utils.ts
+        ↓
+globals.css
+        ↓
+localStorage
+        ↓
+App.tsx / layout / main.tsx
+```
+
+Se esse for o caso, copiar somente o componente visual não resolve.
+
+Quero TODA a cadeia funcional.
+
+Portanto:
+
+**NÃO EXTRAIA SOMENTE O BOTÃO.**
+
+Extraia o sistema completo.
+
+---
+
+# 3. FAÇA PRIMEIRO UMA AUDITORIA COMPLETA
+
+Antes de copiar ou modificar qualquer coisa, percorra o projeto inteiro.
+
+Localize absolutamente tudo relacionado à acessibilidade.
+
+Procure por arquivos, imports, funções, estados, estilos e referências contendo termos como:
+
+- Accessibility
+- AccessibilityWidget
+- AccessibilityButton
+- AccessibilityPanel
+- accessibility
+- a11y
+- useAccessibility
+- useAccessibilityStore
+- Zustand
+- localStorage
+- sessionStorage
+- contrast
+- high contrast
+- font size
+- text size
+- font
+- spacing
+- letter spacing
+- line height
+- dyslexia
+- readable font
+- grayscale
+- saturate
+- color blindness
+- daltonismo
+- protanopia
+- deuteranopia
+- tritanopia
+- color vision
+- reduced motion
+- animations
+- focus
+- focus-visible
+- keyboard
+- ARIA
+- aria-label
+- aria-expanded
+- aria-controls
+- role
+- screen reader
+- sr-only
+- cursor
+- highlight links
+- links
+- reading
+- accessibility preferences
+- accessibility settings
+- CSS variables
+- data attributes
+- document.documentElement
+- document.body
+- classList
+- style.setProperty
+
+Não procure apenas por nomes óbvios.
+
+Analise também referências indiretas.
+
+---
+
+# 4. ANALISE TODOS OS PONTOS DE INTEGRAÇÃO
+
+Verifique se o sistema depende de alguma modificação em:
+
+- `App.tsx`
+- `main.tsx`
+- `index.tsx`
+- `layout.tsx`
+- `root.tsx`
+- `globals.css`
+- `index.css`
+- `App.css`
+- Tailwind
+- `tailwind.config`
+- providers
+- contexts
+- stores
+- hooks
+- components
+- utilities
+- constants
+- themes
+- tokens
+- arquivos de configuração
+- arquivos de tipos
+- arquivos de assets
+- SVGs
+- ícones
+- bibliotecas externas
+- `package.json`
+
+Se existir qualquer dependência, registre.
+
+---
+
+# 5. MAPEIE A ARQUITETURA REAL DO SISTEMA
+
+Depois da auditoria, monte uma visão clara da arquitetura.
+
+Quero algo semelhante a:
+
+```text
+AccessibilityWidget
+├── abre AccessibilityPanel
+├── lê estado de useAccessibilityStore
+├── chama ações do store
+│
+useAccessibilityStore
+├── controla tamanho de fonte
+├── controla contraste
+├── controla modo de visão de cores
+├── controla redução de movimento
+├── salva preferências
+└── restaura preferências
+│
+Global CSS
+├── classes de contraste
+├── alterações de fonte
+├── filtros de cor
+├── redução de animações
+└── outras regras
+```
+
+Esse exemplo é apenas ilustrativo.
+
+Use a estrutura REAL do projeto.
+
+---
+
+# 6. FAÇA UM INVENTÁRIO DE TODOS OS ARQUIVOS ENVOLVIDOS
+
+Crie uma tabela contendo:
+
+| Arquivo | Função | Obrigatório? | Dependências | Precisa adaptar? |
+|---|---|---|---|---|
+
+Inclua todos os arquivos relevantes.
+
+Quero saber exatamente:
+
+- qual arquivo mostra o botão;
+- qual arquivo mostra o menu;
+- onde fica o estado;
+- onde ficam as ações;
+- onde ficam os estilos;
+- onde ficam as preferências;
+- onde ocorre a aplicação global das configurações.
+
+---
+
+# 7. INVENTÁRIO DAS FUNCIONALIDADES EXISTENTES
+
+Não invente funcionalidades.
+
+Descubra exatamente o que já existe atualmente.
+
+Crie uma tabela semelhante a:
+
+| Funcionalidade | Existe? | Funciona? | Arquivo responsável | Persistente? |
+|---|---:|---:|---|---:|
+| Aumentar fonte | | | | |
+| Diminuir fonte | | | | |
+| Resetar fonte | | | | |
+| Alto contraste | | | | |
+| Escala de cinza | | | | |
+| Protanopia | | | | |
+| Deuteranopia | | | | |
+| Tritanopia | | | | |
+| Reduzir movimento | | | | |
+| Destacar links | | | | |
+| Fonte legível | | | | |
+| Espaçamento entre letras | | | | |
+| Espaçamento entre linhas | | | | |
+| Cursor ampliado | | | | |
+| Foco visível | | | | |
+| Resetar acessibilidade | | | | |
+| Persistência | | | | |
+
+Se uma funcionalidade não existir, indique claramente.
+
+Não implemente automaticamente só porque ela apareceu nessa lista.
+
+---
+
+# 8. REVISE SE AS FUNCIONALIDADES REALMENTE FUNCIONAM
+
+Depois de mapear o sistema, teste cada funcionalidade.
+
+Não considere funcional apenas porque existe um botão.
+
+Verifique se a ação realmente produz o efeito esperado na aplicação.
+
+Teste:
+
+- ativar;
+- desativar;
+- alternar várias vezes;
+- combinar funcionalidades;
+- recarregar a página;
+- fechar e abrir novamente;
+- resetar configurações;
+- navegar entre páginas;
+- comportamento em diferentes componentes;
+- mobile;
+- desktop.
+
+---
+
+# 9. PERSISTÊNCIA DAS CONFIGURAÇÕES
+
+Verifique como o sistema salva as preferências.
+
+Pode ser:
+
+- Zustand persist;
+- `localStorage`;
+- `sessionStorage`;
+- contexto;
+- cookies;
+- outro mecanismo.
+
+Documente exatamente como funciona.
+
+Teste:
+
+1. ativar uma preferência;
+2. atualizar a página;
+3. verificar se continua ativa;
+4. resetar;
+5. atualizar novamente;
+6. confirmar que o reset foi persistido.
+
+Se existir problema de persistência, corrija.
+
+---
+
+# 10. ANALISE O STORE DE ACESSIBILIDADE
+
+Se existir algo semelhante a:
+
+`useAccessibilityStore`
+
+revise cuidadosamente.
+
+Verifique:
+
+- estado inicial;
+- ações;
+- reset;
+- persistência;
+- tipagem;
+- SSR;
+- hidratação;
+- chamadas duplicadas;
+- condições inválidas;
+- combinações incompatíveis;
+- possibilidade de múltiplos modos conflitantes.
+
+Se estiver usando Zustand, confirme a versão e a forma correta de utilização.
+
+---
+
+# 11. MODOS DE VISÃO DE CORES / DALTONISMO
+
+Este projeto já teve trabalho relacionado a acessibilidade por deficiência de visão de cores.
+
+Portanto, verifique especificamente se existem modos de:
+
+- visão normal;
+- protanopia;
+- deuteranopia;
+- tritanopia.
+
+Descubra exatamente COMO eles foram implementados.
+
+Pode ser por:
+
+- transformação CSS;
+- matriz de cor;
+- `filter`;
+- SVG filter;
+- variáveis;
+- algoritmo;
+- outra técnica.
+
+Documente.
+
+Não presuma que um simples `filter` seja cientificamente correto.
+
+Se encontrar implementação tecnicamente inadequada, explique claramente.
+
+Se for necessário corrigir, faça isso com cuidado e registre a alteração.
+
+Não transforme essa tarefa em uma reimplementação gigantesca sem necessidade.
+
+---
+
+# 12. DIFERENCIE SIMULAÇÃO DE ADAPTAÇÃO
+
+Se o sistema tiver modos de daltonismo, determine se eles estão fazendo:
+
+**SIMULAÇÃO**
+tentando mostrar como determinadas cores podem ser percebidas;
+
+ou
+
+**ADAPTAÇÃO / DALTONIZAÇÃO**
+tentando alterar as cores da interface para melhorar diferenciação.
+
+Não misture os dois conceitos.
+
+Documente claramente o que a implementação atual faz.
+
+---
+
+# 13. ACESSIBILIDADE DO PRÓPRIO BOTÃO
+
+O próprio botão/menu de acessibilidade precisa ser acessível.
+
+Revise:
+
+- uso por teclado;
+- `Tab`;
+- `Enter`;
+- `Space`;
+- `Escape`;
+- foco;
+- foco visível;
+- ordem de tabulação;
+- `aria-label`;
+- `aria-expanded`;
+- `aria-controls`;
+- roles;
+- descrição do botão;
+- nome acessível;
+- navegação dentro do painel;
+- fechamento do painel;
+- retorno do foco ao botão;
+- leitores de tela.
+
+Não adianta existir um botão de acessibilidade que não seja acessível.
+
+---
+
+# 14. WCAG
+
+Faça uma revisão orientada pelas WCAG atuais aplicáveis ao projeto.
+
+Não quero uma certificação falsa.
+
+Quero uma avaliação prática.
+
+Revise principalmente:
+
+- Perceptível;
+- Operável;
+- Compreensível;
+- Robusto.
+
+Considere:
+
+- contraste;
+- texto;
+- foco;
+- teclado;
+- labels;
+- semântica;
+- ARIA;
+- formulários;
+- mensagens de erro;
+- imagens;
+- `alt`;
+- movimento;
+- zoom;
+- layout responsivo;
+- estados interativos.
+
+Se encontrar problemas fora do botão que sejam essenciais para o funcionamento do sistema de acessibilidade, registre.
+
+---
+
+# 15. PREFERS-REDUCED-MOTION
+
+Se existir opção de reduzir movimento, revise também:
+
+```css
+@media (prefers-reduced-motion: reduce)
+```
+
+O sistema deve respeitar preferências nativas do sistema operacional quando possível.
+
+Não dependa exclusivamente do botão manual.
+
+---
+
+# 16. PREFERS-CONTRAST E PREFERÊNCIAS NATIVAS
+
+Verifique se existem oportunidades razoáveis de respeitar preferências nativas do navegador/SO.
+
+Mas não introduza complexidade desnecessária.
+
+Documente o que foi usado.
+
+---
+
+# 17. FONTE E TAMANHO DE TEXTO
+
+Se o sistema altera tamanho de fonte, verifique se a implementação:
+
+- não quebra o layout;
+- não usa hacks frágeis;
+- não impede zoom;
+- não usa escalas absurdas;
+- funciona em páginas diferentes.
+
+Evite simplesmente aplicar `transform: scale()` na aplicação inteira.
+
+Prefira solução baseada em tipografia quando for o caso.
+
+---
+
+# 18. CONTRASTE
+
+Se existir alto contraste:
+
+- teste textos;
+- ícones;
+- botões;
+- inputs;
+- cards;
+- backgrounds;
+- estados hover;
+- estados disabled;
+- links;
+- modais.
+
+Não valide contraste olhando apenas a página inicial.
+
+---
+
+# 19. REDUÇÃO DE MOVIMENTO
+
+Se o usuário ativar redução de movimento:
+
+revise:
+
+- transitions;
+- animations;
+- parallax;
+- scrolling animado;
+- efeitos decorativos;
+- loaders;
+- transforms.
+
+Não remova informações essenciais.
+
+---
+
+# 20. NAVEGAÇÃO POR TECLADO
+
+Teste o projeto sem mouse.
+
+Verifique:
+
+- menu;
+- botão de acessibilidade;
+- painel;
+- formulários;
+- links;
+- modais;
+- cards clicáveis;
+- dropdowns;
+- controles.
+
+Corrija problemas diretamente relacionados ao sistema de acessibilidade quando necessário.
+
+---
+
+# 21. SEMÂNTICA E ARIA
+
+Revise o código do widget/painel.
+
+Use HTML semântico antes de ARIA.
+
+Não adicione ARIA redundante.
+
+Evite:
+
+- `div` clicável sem semântica;
+- `role="button"` quando poderia usar `<button>`;
+- atributos ARIA incorretos;
+- labels duplicados;
+- elementos interativos sem nome acessível.
+
+---
+
+# 22. RESPONSIVIDADE
+
+Teste o sistema em:
+
+- desktop;
+- notebook;
+- tablet;
+- celular.
+
+Verifique principalmente:
+
+- posição do botão;
+- painel aberto;
+- overflow;
+- scroll;
+- conteúdo cortado;
+- tamanho dos controles;
+- toque;
+- viewport reduzida.
+
+---
+
+# 23. NÃO ALTERE O FRONT-END INTEIRO
+
+Não faça redesign.
+
+Preserve:
+
+- identidade visual;
+- estrutura;
+- navegação;
+- componentes;
+- experiência existente.
+
+Faça somente alterações necessárias para:
+
+- corrigir acessibilidade;
+- eliminar bugs;
+- tornar o módulo portátil;
+- facilitar integração.
+
+---
+
+# 24. IDENTIFIQUE O QUE É ESPECÍFICO DESTE PROJETO
+
+Muito importante.
+
+Alguns arquivos podem depender de:
+
+- classes específicas;
+- tokens;
+- componentes próprios;
+- alias de import;
+- biblioteca de ícones;
+- sistema de temas;
+- Tailwind;
+- layout;
+- componentes UI.
+
+Identifique essas dependências.
+
+Classifique cada parte como:
+
+### PORTÁTIL
+Pode ser copiada diretamente.
+
+### ADAPTÁVEL
+Precisa de pequenas mudanças.
+
+### ESPECÍFICA DESTE PROJETO
+Não deve ser copiada sem refatoração.
+
+---
+
+# 25. DESACOPLE QUANDO FIZER SENTIDO
+
+Se houver dependências desnecessárias com o projeto principal, reduza o acoplamento.
+
+Exemplo:
+
+Se o componente importa um botão específico do design system apenas para aparência, pode fazer sentido tornar isso independente.
+
+Mas NÃO reescreva o módulo inteiro só para atingir uma abstração perfeita.
+
+O objetivo é praticidade.
+
+---
+
+# 26. CRIE UMA ESTRUTURA DE EXPORTAÇÃO
+
+Depois de revisar tudo, crie uma pasta separada contendo o sistema exportável.
+
+Sugestão:
+
+```text
+accessibility-module/
+│
+├── components/
+│   ├── AccessibilityWidget.tsx
+│   ├── AccessibilityPanel.tsx
+│   └── ...
+│
+├── hooks/
+│   └── ...
+│
+├── store/
+│   └── useAccessibilityStore.ts
+│
+├── utils/
+│   └── ...
+│
+├── styles/
+│   └── accessibility.css
+│
+├── types/
+│   └── ...
+│
+├── assets/
+│   └── ...
+│
+├── README.md
+├── INSTALLATION.md
+├── INTEGRATION.md
+├── DEPENDENCIES.md
+└── CHANGELOG.md
+```
+
+Essa estrutura é apenas referência.
+
+Use a melhor estrutura com base no código real.
+
+---
+
+# 27. NÃO DUPLIQUE ARQUIVOS INÚTEIS
+
+O pacote não deve conter o projeto inteiro.
+
+Inclua somente o necessário para o módulo.
+
+Não inclua:
+
+- `node_modules`;
+- build;
+- cache;
+- `.env`;
+- credenciais;
+- chaves;
+- arquivos de usuário;
+- `.git`;
+- arquivos sem relação com acessibilidade.
+
+---
+
+# 28. DEPENDÊNCIAS NPM
+
+Liste todas as dependências externas necessárias.
+
+Exemplo:
+
+```bash
+npm install zustand lucide-react
+```
+
+Mas use SOMENTE as dependências reais.
+
+Verifique o `package.json`.
+
+Diferencie:
+
+- dependências obrigatórias;
+- dependências opcionais;
+- dependências que já podem existir no projeto de destino.
+
+---
+
+# 29. README COMPLETO
+
+Crie um `README.md` bem escrito.
+
+Ele deve explicar:
+
+## O que é
+
+Descrição do módulo.
+
+## Funcionalidades
+
+Tudo que ele oferece.
+
+## Requisitos
+
+React, TypeScript etc.
+
+## Instalação
+
+Passo a passo.
+
+## Dependências
+
+Comandos necessários.
+
+## Estrutura
+
+Explicação das pastas.
+
+## Integração
+
+Onde importar.
+
+## Uso
+
+Exemplo mínimo.
+
+## Persistência
+
+Como funciona.
+
+## Personalização
+
+Como ajustar visual sem quebrar a lógica.
+
+## Acessibilidade
+
+Quais recursos estão incluídos.
+
+## Limitações
+
+O que depende da aplicação de destino.
+
+---
+
+# 30. GUIA DE INTEGRAÇÃO
+
+Crie também um guia específico para meu amigo.
+
+Exemplo:
+
+```markdown
+# Integração no novo projeto
+
+1. Copie a pasta X para:
+   src/components/accessibility/
+
+2. Instale:
+   npm install ...
+
+3. Importe o CSS em:
+   src/main.tsx
+
+4. Adicione:
+   <AccessibilityWidget />
+
+5. Se existir Provider:
+   envolva a aplicação com ...
+
+6. Teste:
+   npm run dev
+```
+
+Mas adapte às necessidades reais.
+
+---
+
+# 31. MOSTRE EXATAMENTE ONDE ADICIONAR O COMPONENTE
+
+Não escreva apenas:
+
+“adicione no App”.
+
+Mostre código real.
+
+Exemplo:
+
+```tsx
+import { AccessibilityWidget } from "./components/accessibility/AccessibilityWidget";
+
+function App() {
+  return (
+    <>
+      <Routes />
+      <AccessibilityWidget />
+    </>
+  );
+}
+```
+
+Novamente: adapte ao componente real.
+
+---
+
+# 32. CSS GLOBAL
+
+Se o módulo depender de estilos globais, documente exatamente:
+
+```tsx
+import "./styles/accessibility.css";
+```
+
+ou o equivalente.
+
+Explique onde importar.
+
+---
+
+# 33. TAILWIND
+
+Se houver dependência de Tailwind:
+
+- informe;
+- identifique classes;
+- explique se precisa alterar `content`;
+- explique se precisa copiar tokens;
+- explique possíveis conflitos.
+
+Se for possível manter a integração simples sem retirar Tailwind do módulo, não faça uma refatoração enorme.
+
+---
+
+# 34. ALIASES
+
+Se houver imports como:
+
+```tsx
+@/components/...
+```
+
+o outro projeto pode não possuir esse alias.
+
+Portanto:
+
+- identifique todos;
+- converta para imports portáveis se fizer sentido;
+- ou documente como configurar o alias.
+
+Prefira reduzir dependências desnecessárias.
+
+---
+
+# 35. TYPESCRIPT
+
+O pacote deve passar por TypeScript sem erros.
+
+Verifique:
+
+```bash
+npm run build
+```
+
+ou o comando correspondente.
+
+Não ignore erros usando:
+
+```ts
+any
+```
+
+indiscriminadamente.
+
+Não use:
+
+```ts
+// @ts-ignore
+```
+
+apenas para esconder problemas.
+
+---
+
+# 36. TESTES
+
+Execute os testes existentes relacionados.
+
+Se o projeto não tiver testes específicos para o módulo, faça pelo menos validações funcionais.
+
+Teste:
+
+- abrir;
+- fechar;
+- aplicar preferências;
+- resetar;
+- persistência;
+- reload;
+- navegação;
+- teclado;
+- combinação de opções.
+
+---
+
+# 37. TESTE O PACOTE DE FORMA ISOLADA
+
+Muito importante:
+
+Não considere o pacote pronto apenas porque funciona dentro deste projeto.
+
+Faça uma verificação de portabilidade.
+
+Analise se um projeto React + TypeScript separado conseguiria utilizá-lo com as instruções fornecidas.
+
+Procure imports quebrados ou dependências escondidas.
+
+---
+
+# 38. CRIE UM ZIP FINAL
+
+Depois que o pacote estiver pronto, gere um arquivo semelhante a:
+
+```text
+accessibility-module.zip
+```
+
+ou:
+
+```text
+sistema-acessibilidade.zip
+```
+
+Dentro dele deve existir a estrutura organizada.
+
+Esse é o arquivo que quero poder mandar ao meu amigo.
+
+Não inclua informações sensíveis.
+
+---
+
+# 39. NÃO MEXA NA VERSÃO ORIGINAL SEM NECESSIDADE
+
+O sistema atualmente utilizado pelo projeto precisa continuar funcionando.
+
+Ao preparar a versão exportável:
+
+- preserve o comportamento atual;
+- não cause regressões;
+- não remova funcionalidades;
+- não quebre imports.
+
+Se precisar alterar o sistema original para corrigir um bug, faça conscientemente e registre.
+
+---
+
+# 40. DOCUMENTE TODAS AS ALTERAÇÕES
+
+Crie um changelog do que foi:
+
+- encontrado;
+- corrigido;
+- refatorado;
+- desacoplado;
+- exportado.
+
+---
+
+# 41. RELATÓRIO FINAL
+
+Quando terminar, quero um relatório claro contendo:
+
+## A. Como o sistema estava estruturado
+
+Explique se era realmente um único arquivo ou vários.
+
+## B. Arquivos encontrados
+
+Liste todos.
+
+## C. Funcionalidades existentes
+
+Liste todas.
+
+## D. Problemas encontrados
+
+Liste bugs, limitações e dependências.
+
+## E. Correções realizadas
+
+Explique cada uma.
+
+## F. Estrutura do pacote
+
+Mostre a árvore.
+
+## G. Dependências
+
+Liste comandos.
+
+## H. Como integrar
+
+Resumo prático.
+
+## I. Testes
+
+Diga exatamente o que foi testado.
+
+## J. Arquivo final
+
+Informe o caminho do `.zip` criado.
+
+---
+
+# 42. CLASSIFIQUE O RESULTADO COM HONESTIDADE
+
+Para cada item, utilize uma destas classificações:
+
+### CONCLUÍDO E VALIDADO
+Foi implementado e testado.
+
+### IMPLEMENTADO, MAS NÃO VALIDADO
+Foi feito, mas não foi possível testar completamente.
+
+### PENDENTE
+Ainda falta trabalho.
+
+### DEPENDÊNCIA EXTERNA
+Depende de algo fora do código.
+
+Não diga que está 100% pronto se existir algo ainda não verificado.
+
+---
+
+# 43. NÃO PARE DEPOIS DA ANÁLISE
+
+Isso é extremamente importante.
+
+Não quero somente:
+
+“Analisei e encontrei estes arquivos.”
+
+Depois da análise:
+
+1. revise;
+2. corrija;
+3. organize;
+4. desacople quando necessário;
+5. prepare documentação;
+6. teste;
+7. gere o pacote;
+8. gere o `.zip`;
+9. entregue o relatório final.
+
+Continue até concluir tudo que for possível dentro do ambiente.
+
+---
+
+# 44. NÃO ME PEÇA PARA IDENTIFICAR ARQUIVOS QUE VOCÊ CONSEGUE ENCONTRAR
+
+Você tem acesso ao projeto.
+
+Portanto, investigue.
+
+Não pergunte:
+
+“qual é o arquivo do botão?”
+
+Descubra.
+
+Também não me peça para copiar código manualmente se você consegue acessar o repositório.
+
+---
+
+# 45. NÃO INVENTE O ESTADO DO PROJETO
+
+O projeto foi modificado diversas vezes anteriormente.
+
+Portanto, antes de agir:
+
+- abra os arquivos atuais;
+- confira o Git;
+- veja o código atual;
+- confirme dependências;
+- confirme estrutura.
+
+Não confie apenas em mensagens antigas da conversa.
+
+---
+
+# 46. USE O HISTÓRICO DESTA CONVERSA
+
+Este comando é uma continuação do projeto.
+
+Recupere o contexto relevante anterior relacionado a:
+
+- acessibilidade;
+- botão de acessibilidade;
+- modos de daltonismo;
+- React;
+- TypeScript;
+- Zustand;
+- UI;
+- requisitos do projeto.
+
+Use esse histórico para entender a intenção.
+
+Mas sempre confirme no código o que realmente existe atualmente.
+
+---
+
+# 47. NÃO IMPLEMENTE “ACESSIBILIDADE FAKE”
+
+Não quero funcionalidades que apenas mudam a aparência superficialmente.
+
+Exemplos ruins:
+
+- botão de contraste que só inverte toda a tela sem critério;
+- “modo daltonismo” com filtro aleatório;
+- aumentar texto usando zoom no site inteiro;
+- reduzir movimento quebrando interações;
+- adicionar ARIA em tudo indiscriminadamente.
+
+Quero implementação tecnicamente coerente.
+
+---
+
+# 48. ACESSIBILIDADE NÃO É APENAS O WIDGET
+
+Ao revisar, entenda que o widget é uma ferramenta adicional.
+
+Acessibilidade real também envolve a aplicação.
+
+Portanto, se identificar problemas importantes no projeto que façam o widget não cumprir seu propósito, registre no relatório.
+
+Porém, o foco desta tarefa continua sendo:
+
+**EXPORTAR E DOCUMENTAR O SISTEMA DE ACESSIBILIDADE PARA REUTILIZAÇÃO.**
+
+---
+
+# 49. EVITE OVERENGINEERING
+
+O pacote precisa ser simples de integrar.
+
+Não transforme isso em:
+
+- biblioteca npm;
+- monorepo;
+- pacote publicado;
+- design system completo;
+- framework de acessibilidade;
+
+a menos que isso já exista ou seja absolutamente necessário.
+
+Um `.zip` organizado com código limpo e documentação já é suficiente.
+
+---
+
+# 50. RESULTADO QUE EU ESPERO
+
+No fim desta tarefa, eu quero conseguir falar para meu amigo:
+
+> “Baixa esse ZIP. Dentro dele está todo o sistema de acessibilidade do nosso outro projeto, com os componentes, store, estilos, dependências e um guia mostrando exatamente como integrar no nosso projeto.”
+
+E isso deve ser verdade.
+
+O pacote deve ser suficientemente completo para evitar que eu mande:
+
+- um componente e esqueça o store;
+- o store e esqueça o CSS;
+- CSS e esqueça as classes globais;
+- o botão e esqueça o Provider;
+- código e esqueça as dependências;
+- arquivos que dependem de imports que não existem.
+
+---
+
+# 51. ORDEM DE EXECUÇÃO OBRIGATÓRIA
+
+Siga esta sequência:
+
+1. Leia o histórico relevante.
+2. Inspecione o estado atual do projeto.
+3. Localize todo o sistema de acessibilidade.
+4. Mapeie dependências.
+5. Liste funcionalidades.
+6. Teste as funcionalidades existentes.
+7. Identifique problemas.
+8. Corrija problemas necessários.
+9. Desacople dependências desnecessárias.
+10. Monte uma versão portátil.
+11. Crie documentação.
+12. Teste a versão portátil.
+13. Execute build e testes possíveis.
+14. Gere o `.zip`.
+15. Faça uma revisão final.
+16. Entregue o relatório.
+
+Não pule diretamente para a criação do ZIP antes de entender o sistema.
+
+---
+
+# 52. CRITÉRIOS DE ACEITAÇÃO
+
+Considere a tarefa concluída somente se:
+
+- todo o sistema de acessibilidade tiver sido localizado;
+- as dependências estiverem mapeadas;
+- as funcionalidades existentes estiverem documentadas;
+- bugs críticos encontrados tiverem sido tratados;
+- o pacote não depender de arquivos omitidos;
+- o código estiver organizado;
+- TypeScript não apresentar erros relacionados;
+- o build continuar funcionando;
+- a integração estiver documentada;
+- o `.zip` existir;
+- nenhum segredo estiver presente;
+- o projeto original continuar funcional;
+- o relatório final indicar honestamente tudo que foi ou não validado.
+
+Comece agora pela inspeção do projeto atual e prossiga autonomamente pelas etapas seguintes.

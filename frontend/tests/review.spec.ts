@@ -1,4 +1,5 @@
-import { test, expect, chromium } from "@playwright/test";
+import { chromium } from "@playwright/test";
+import { test, expect, mockAppApi } from "./fixtures/app";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -44,6 +45,7 @@ test("inspeção visual, console e critérios de instalação", async () => {
     headless: true,
     baseURL: "http://127.0.0.1:4173",
   });
+  await mockAppApi(context);
   const page = await context.newPage();
   try {
     const errors: string[] = [];
@@ -66,7 +68,8 @@ test("inspeção visual, console e critérios de instalação", async () => {
         "/perfil/dados",
       ]) {
         await page.goto(route);
-        await page.waitForTimeout(route.includes("mapa") ? 3000 : 250);
+        await expect(page.locator("main h1")).toBeVisible();
+        await expect(page.locator("main [role=alert]")).toHaveCount(0);
         await page.screenshot({
           path: `test-results/visual-${width}-${route.split("?")[0].replaceAll("/", "_") || "home"}.png`,
           fullPage: true,
