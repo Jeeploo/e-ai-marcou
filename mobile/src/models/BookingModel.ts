@@ -13,6 +13,12 @@ export type BookingTimeSlot = {
   time: string;
 };
 
+export type RequiredBookingSelection = {
+  professionalId: string;
+  date: string;
+  time: string;
+};
+
 export type BookingSelection = {
   professionalId: string;
   date: string | null;

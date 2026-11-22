@@ -3,6 +3,7 @@ import type {
   BookingProfessional,
   BookingSelection,
   BookingTimeSlot,
+  RequiredBookingSelection,
 } from '../models/BookingModel';
 import { findProfessionalById } from './searchController';
 
@@ -55,4 +56,18 @@ export function isBookingSelectionComplete(
     && options.times.some(({ time }) => time === selection.time);
 }
 
-type RequiredBookingSelection = BookingSelection & { date: string; time: string };
+export function getBookingSummary({ professionalId, date, time }: RequiredBookingSelection) {
+  const professional = findProfessionalById(professionalId);
+  const selectedDate = new Date(`${date}T00:00:00`);
+
+  if (!professional || !timesByProfessional[professionalId]?.includes(time) || Number.isNaN(selectedDate.getTime())) {
+    return null;
+  }
+
+  return {
+    professional,
+    dateLabel: dateLabelFormat.format(selectedDate),
+    time,
+    priceLabel: priceFormat.format(professional.price),
+  };
+}

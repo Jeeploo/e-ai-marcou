@@ -1,6 +1,8 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { colors } from '../theme/colors';
+import { BookingConfirmationScreen } from '../views/screens/BookingConfirmationScreen';
+import { BookingReviewScreen } from '../views/screens/BookingReviewScreen';
 import { BookingSlotsScreen } from '../views/screens/BookingSlotsScreen';
 import { MainTabs } from './MainTabs';
 import type { RootStackParamList } from './types';
@@ -21,6 +23,12 @@ export function RootNavigator() {
             headerTintColor: colors.primary,
             headerStyle: { backgroundColor: colors.surface },
           }}
+        />
+        <Stack.Screen name="BookingReview" component={BookingReviewScreen} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="BookingConfirmation"
+          component={BookingConfirmationScreen}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

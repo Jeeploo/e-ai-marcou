@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getBookingOptions, isBookingSelectionComplete } from '../../controllers/bookingController';
 import { useCompactLayout } from '../../hooks/useCompactLayout';
@@ -14,7 +14,7 @@ import { PrimaryButton } from '../components/PrimaryButton';
 
 type BookingSlotsScreenProps = NativeStackScreenProps<RootStackParamList, 'BookingSlots'>;
 
-export function BookingSlotsScreen({ route }: BookingSlotsScreenProps) {
+export function BookingSlotsScreen({ navigation, route }: BookingSlotsScreenProps) {
   const { professionalId } = route.params;
   const compact = useCompactLayout();
   const [options] = useState(() => getBookingOptions(professionalId));
@@ -27,7 +27,7 @@ export function BookingSlotsScreen({ route }: BookingSlotsScreenProps) {
 
   function reviewBooking() {
     if (canReview) {
-      Alert.alert('Revisar agendamento', 'A revisão do agendamento será implementada na próxima etapa.');
+      navigation.navigate('BookingReview', { professionalId, date: selection.date, time: selection.time });
     }
   }
 
