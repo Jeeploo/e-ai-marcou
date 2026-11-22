@@ -13,4 +13,5 @@ export type RootStackParamList = {
   BookingSlots: { professionalId: string };
   BookingReview: RequiredBookingSelection;
   BookingConfirmation: RequiredBookingSelection;
+  AppointmentDetails: { appointmentId: string };
 };

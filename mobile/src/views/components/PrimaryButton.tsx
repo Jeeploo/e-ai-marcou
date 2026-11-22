@@ -7,6 +7,7 @@ type PrimaryButtonProps = {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  destructive?: boolean;
   variant?: 'filled' | 'outline';
 };
 
@@ -15,6 +16,7 @@ export function PrimaryButton({
   onPress,
   variant = 'filled',
   disabled = false,
+  destructive = false,
 }: PrimaryButtonProps) {
   const outlined = variant === 'outline';
 
@@ -28,11 +30,19 @@ export function PrimaryButton({
       style={({ pressed }) => [
         styles.button,
         outlined && styles.outline,
+        destructive && (outlined ? styles.destructiveOutline : styles.destructive),
         disabled && styles.disabled,
         pressed && !disabled && styles.pressed,
       ]}
     >
-      <Text style={[styles.label, outlined && styles.outlineLabel, disabled && styles.disabledLabel]}>{label}</Text>
+      <Text style={[
+        styles.label,
+        outlined && styles.outlineLabel,
+        outlined && destructive && styles.destructiveLabel,
+        disabled && styles.disabledLabel,
+      ]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -58,6 +68,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   outlineLabel: { color: colors.primary },
+  destructive: { borderColor: colors.accent, backgroundColor: colors.accent },
+  destructiveOutline: { borderColor: colors.accent },
+  destructiveLabel: { color: colors.accent },
   disabled: { backgroundColor: colors.secondary, borderColor: colors.border },
   disabledLabel: { color: colors.textSecondary },
   pressed: { opacity: 0.8 },
