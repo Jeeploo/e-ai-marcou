@@ -9,4 +9,5 @@ export type MainTabParamList = {
 
 export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList>;
+  BookingSlots: { professionalId: string };
 };

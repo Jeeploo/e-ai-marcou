@@ -1,3 +1,6 @@
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { CompositeScreenProps } from '@react-navigation/native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,6 +16,7 @@ import {
   type LocationReference,
   type SearchFilters,
 } from '../../models/SearchModel';
+import type { MainTabParamList, RootStackParamList } from '../../navigation/types';
 import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
@@ -25,7 +29,12 @@ import { SearchFiltersModal } from '../components/SearchFiltersModal';
 
 const patientName = getHomeData().patientName;
 
-export function SearchScreen() {
+type SearchScreenProps = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, 'Search'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+export function SearchScreen({ navigation }: SearchScreenProps) {
   const compact = useCompactLayout();
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState(clearSearchFilters);
@@ -140,10 +149,11 @@ export function SearchScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <ProfessionalCard compact={compact} professional={item} onViewTimes={() => Alert.alert(
-            item.name,
-            'Seleção de horários será implementada na próxima etapa.',
-          )} />
+          <ProfessionalCard
+            compact={compact}
+            professional={item}
+            onViewTimes={() => navigation.navigate('BookingSlots', { professionalId: item.id })}
+          />
         )}
         ItemSeparatorComponent={ResultSeparator}
         ListEmptyComponent={<EmptySearchState onClear={clearSearch} />}

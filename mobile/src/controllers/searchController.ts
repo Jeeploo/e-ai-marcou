@@ -39,6 +39,10 @@ const professionals: readonly Professional[] = [
   },
 ];
 
+export function findProfessionalById(id: string) {
+  return professionals.find((professional) => professional.id === id);
+}
+
 export function clearSearchFilters(): SearchFilters {
   return { specialty: null, minPrice: '', maxPrice: '', order: 'Recomendados' };
 }
