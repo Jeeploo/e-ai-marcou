@@ -9,3 +9,17 @@ export const typography = {
   sectionTitle: 19,
   button: 15,
 } as const;
+
+export type AppTypography = { [Key in keyof typeof typography]: number };
+
+export const largeTypography: AppTypography = {
+  brand: 23,
+  profile: 14,
+  greeting: 28,
+  body: 18,
+  appointmentTitle: 21,
+  professionalName: 19,
+  caption: 15,
+  sectionTitle: 22,
+  button: 18,
+};

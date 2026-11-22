@@ -1,11 +1,10 @@
+import { useAppTheme, useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, Text, View } from 'react-native';
 import { getAppointmentDateLabel, getAppointmentStatusLabel } from '../../controllers/appointmentController';
 import { useCompactLayout } from '../../hooks/useCompactLayout';
 import type { Appointment } from '../../models/AppointmentModel';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { PrimaryButton } from './PrimaryButton';
 
 type AppointmentCardProps = {
@@ -15,6 +14,8 @@ type AppointmentCardProps = {
 };
 
 export function AppointmentCard({ appointment, onDetails, onReschedule }: AppointmentCardProps) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   const compact = useCompactLayout();
 
   return (
@@ -42,7 +43,7 @@ export function AppointmentCard({ appointment, onDetails, onReschedule }: Appoin
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   card: {
     gap: spacing.md,
     padding: spacing.lg,

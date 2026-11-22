@@ -1,3 +1,4 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -11,9 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { searchOrders, specialties, type SearchFilters } from '../../models/SearchModel';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { PrimaryButton } from './PrimaryButton';
 
 type SearchFiltersModalProps = {
@@ -32,6 +31,7 @@ function FilterOption({ label, selected, onPress }: {
   selected: boolean;
   onPress: () => void;
 }) {
+  const styles = useThemedStyles(createStyles);
   return (
     <Pressable
       accessibilityRole="radio"
@@ -48,6 +48,7 @@ function FilterOption({ label, selected, onPress }: {
 export function SearchFiltersModal({
   compact, visible, filters, error, onChange, onClose, onClear, onApply,
 }: SearchFiltersModalProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.screen} accessibilityViewIsModal>
@@ -129,7 +130,7 @@ export function SearchFiltersModal({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   scroll: { paddingHorizontal: spacing.xl, paddingVertical: spacing.lg },
   content: { width: '100%', maxWidth: 600, alignSelf: 'center', gap: spacing.lg },

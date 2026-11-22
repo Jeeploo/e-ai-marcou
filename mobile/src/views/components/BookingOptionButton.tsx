@@ -1,8 +1,7 @@
+import { useAppTheme, useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 
 type BookingOptionButtonProps = {
   label: string;
@@ -21,6 +20,8 @@ export function BookingOptionButton({
   compact,
   onPress,
 }: BookingOptionButtonProps) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <Pressable
       accessibilityRole="button"
@@ -41,7 +42,7 @@ export function BookingOptionButton({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   button: {
     minWidth: 0,
     minHeight: spacing.touchTarget,

@@ -1,8 +1,7 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { StyleSheet, Text, View } from 'react-native';
 import type { Professional } from '../../models/SearchModel';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { PrimaryButton } from './PrimaryButton';
 
 type ProfessionalCardProps = {
@@ -20,6 +19,7 @@ const priceFormat = new Intl.NumberFormat('pt-BR', {
 const distanceFormat = new Intl.NumberFormat('pt-BR');
 
 export function ProfessionalCard({ professional, compact, onViewTimes }: ProfessionalCardProps) {
+  const styles = useThemedStyles(createStyles);
   const { name, specialty, neighborhood, distanceKm, price, nextTime } = professional;
 
   const distance = `${distanceFormat.format(distanceKm)} km`;
@@ -40,7 +40,7 @@ export function ProfessionalCard({ professional, compact, onViewTimes }: Profess
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   card: {
     gap: spacing.md,
     padding: spacing.lg,

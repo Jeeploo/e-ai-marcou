@@ -1,7 +1,6 @@
+import { useAppTheme, useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 
 type SearchFieldProps = {
   value: string;
@@ -10,6 +9,8 @@ type SearchFieldProps = {
 };
 
 export function SearchField({ value, compact, onChangeText }: SearchFieldProps) {
+  const styles = useThemedStyles(createStyles);
+  const { colors } = useAppTheme();
   return (
     <View style={[styles.field, compact && styles.stackedField]}>
       <TextInput
@@ -38,7 +39,7 @@ export function SearchField({ value, compact, onChangeText }: SearchFieldProps) 
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   field: {
     flexDirection: 'row',
     flexWrap: 'wrap',

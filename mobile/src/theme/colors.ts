@@ -9,3 +9,17 @@ export const colors = {
   border: '#859B9A',
   success: '#245D47',
 } as const;
+
+export type AppColors = { [Key in keyof typeof colors]: string };
+
+export const highContrastColors: AppColors = {
+  background: '#F7F9FB',
+  surface: '#FFFFFF',
+  primary: '#0B302E',
+  secondary: '#DDECE9',
+  accent: '#852810',
+  textPrimary: '#121D2C',
+  textSecondary: '#293849',
+  border: '#4D6463',
+  success: '#194936',
+};

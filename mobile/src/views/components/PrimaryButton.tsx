@@ -1,7 +1,6 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 
 type PrimaryButtonProps = {
   label: string;
@@ -18,6 +17,7 @@ export function PrimaryButton({
   disabled = false,
   destructive = false,
 }: PrimaryButtonProps) {
+  const styles = useThemedStyles(createStyles);
   const outlined = variant === 'outline';
 
   return (
@@ -47,7 +47,7 @@ export function PrimaryButton({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   button: {
     width: '100%',
     minHeight: 51,

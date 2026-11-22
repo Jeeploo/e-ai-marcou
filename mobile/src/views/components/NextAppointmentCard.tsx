@@ -1,10 +1,10 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { StyleSheet, Text, View } from 'react-native';
 import type { NextAppointment } from '../../models/HomeModel';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 
 export function NextAppointmentCard({ appointment }: { appointment: NextAppointment }) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.card}>
       <Text accessibilityRole="header" style={styles.heading}>Sua próxima visita</Text>
@@ -17,7 +17,7 @@ export function NextAppointmentCard({ appointment }: { appointment: NextAppointm
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   card: {
     minWidth: 0,
     gap: spacing.sm,

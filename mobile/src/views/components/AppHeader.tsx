@@ -1,18 +1,18 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 
 type AppHeaderProps = {
   patientName: string;
   compact: boolean;
-  onAccessibilityPress?: () => void;
+  onAccessibilityPress: () => void;
 };
 
 export function AppHeader({ patientName, compact, onAccessibilityPress }: AppHeaderProps) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={[styles.header, compact && styles.compactHeader]}>
-      <View style={[styles.identity, compact && styles.compactIdentity]}>
+      <View style={styles.identity}>
         <Text style={styles.brand} maxFontSizeMultiplier={1.25}>
           e aí, <Text style={styles.brandAccent}>marcou?</Text>
         </Text>
@@ -20,23 +20,17 @@ export function AppHeader({ patientName, compact, onAccessibilityPress }: AppHea
       </View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={compact ? "Abrir configurações de acessibilidade" : "Acessibilidade"}
-        accessibilityState={{ disabled: !onAccessibilityPress }}
-        disabled={!onAccessibilityPress}
+        accessibilityLabel="Acessibilidade"
         onPress={onAccessibilityPress}
         style={[styles.accessibilityButton, compact && styles.compactButton]}
       >
-        {compact ? (
-          <Text accessible={false} importantForAccessibility="no" style={styles.accessibilityIcon}>⚙</Text>
-        ) : (
-          <Text style={styles.accessibilityLabel}>Acessibilidade</Text>
-        )}
+        <Text style={styles.accessibilityLabel}>Acessibilidade</Text>
       </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -47,8 +41,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
     paddingBottom: spacing.sm,
   },
-  compactHeader: { flexWrap: 'nowrap' },
-  compactIdentity: { flex: 1 },
+  compactHeader: { flexDirection: 'column', flexWrap: 'nowrap' },
   identity: {
     flexGrow: 1,
     flexShrink: 1,
@@ -78,7 +71,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.sm,
   },
-  accessibilityIcon: { color: colors.primary, fontSize: typography.brand },
   accessibilityLabel: {
     color: colors.primary,
     fontSize: typography.button,

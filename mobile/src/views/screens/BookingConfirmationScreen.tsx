@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { getBookingSummary } from '../../controllers/bookingController';
 import type { RootStackParamList } from '../../navigation/types';
-import { colors } from '../../theme/colors';
+import { useAppTheme } from '../../hooks/useAppTheme';
 import { BookingDetailsLayout } from '../components/BookingDetailsLayout';
 import { BookingSummary } from '../components/BookingSummary';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -10,6 +10,8 @@ import { PrimaryButton } from '../components/PrimaryButton';
 type BookingConfirmationScreenProps = NativeStackScreenProps<RootStackParamList, 'BookingConfirmation'>;
 
 export function BookingConfirmationScreen({ navigation, route }: BookingConfirmationScreenProps) {
+  const { colors } = useAppTheme();
+  const isRescheduleDemo = Boolean(route.params.demoProfessional);
   const summary = getBookingSummary(route.params);
 
   function openAppointments() {
@@ -21,8 +23,8 @@ export function BookingConfirmationScreen({ navigation, route }: BookingConfirma
 
   return (
     <BookingDetailsLayout
-      title={summary ? 'Consulta marcada!' : 'Consulta indisponível'}
-      subtitle={summary ? 'Seu agendamento foi confirmado.' : 'Volte para conferir os dados da consulta.'}
+      title={summary ? (isRescheduleDemo ? 'Simulação concluída' : 'Consulta marcada!') : 'Consulta indisponível'}
+      subtitle={summary ? (isRescheduleDemo ? 'Sua consulta original continua marcada.' : 'Seu agendamento foi confirmado.') : 'Volte para conferir os dados da consulta.'}
     >
       {summary ? (
         <>

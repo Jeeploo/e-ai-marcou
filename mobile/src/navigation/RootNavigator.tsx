@@ -1,7 +1,7 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AppointmentsProvider } from '../contexts/AppointmentsContext';
-import { colors } from '../theme/colors';
+import { useAppTheme } from '../hooks/useAppTheme';
 import { AppointmentDetailsScreen } from '../views/screens/AppointmentDetailsScreen';
 import { BookingConfirmationScreen } from '../views/screens/BookingConfirmationScreen';
 import { BookingReviewScreen } from '../views/screens/BookingReviewScreen';
@@ -12,9 +12,21 @@ import type { RootStackParamList } from './types';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export function RootNavigator() {
+  const { colors } = useAppTheme();
+  const theme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.surface,
+      text: colors.textPrimary,
+      border: colors.border,
+    },
+  };
   return (
     <AppointmentsProvider>
-      <NavigationContainer>
+      <NavigationContainer theme={theme}>
         <Stack.Navigator>
           <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
           <Stack.Screen

@@ -1,8 +1,9 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCompactLayout } from '../../hooks/useCompactLayout';
 import { getHomeData } from '../../controllers/homeController';
@@ -17,9 +18,7 @@ import {
   type SearchFilters,
 } from '../../models/SearchModel';
 import type { MainTabParamList, RootStackParamList } from '../../navigation/types';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { AppHeader } from '../components/AppHeader';
 import { EmptySearchState } from '../components/EmptySearchState';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -35,6 +34,7 @@ type SearchScreenProps = CompositeScreenProps<
 >;
 
 export function SearchScreen({ navigation }: SearchScreenProps) {
+  const styles = useThemedStyles(createStyles);
   const compact = useCompactLayout();
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState(clearSearchFilters);
@@ -83,10 +83,7 @@ export function SearchScreen({ navigation }: SearchScreenProps) {
         contentContainerStyle={[styles.list, compact && styles.compactList]}
         ListHeaderComponent={
           <View style={styles.header}>
-            <AppHeader patientName={patientName} compact={compact} onAccessibilityPress={() => Alert.alert(
-              'Acessibilidade',
-              'Você pode ajustar o tamanho do texto nas configurações de acessibilidade do seu celular.',
-            )} />
+            <AppHeader patientName={patientName} compact={compact} onAccessibilityPress={() => navigation.navigate('Profile', { showAccessibility: true })} />
             <View style={styles.group}>
               <Text accessibilityRole="header" style={styles.title}>Encontre seu atendimento</Text>
               <Text style={styles.description}>Busque por especialidade ou profissional.</Text>
@@ -174,10 +171,11 @@ export function SearchScreen({ navigation }: SearchScreenProps) {
 }
 
 function ResultSeparator() {
+  const styles = useThemedStyles(createStyles);
   return <View style={styles.separator} />;
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   list: {
     width: '100%',

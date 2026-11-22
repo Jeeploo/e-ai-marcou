@@ -7,8 +7,10 @@ import type {
 } from '../models/BookingModel';
 import { findProfessionalById } from './searchController';
 
+const rescheduleDemoTimes = ['14:30', '15:30', '16:30'];
+
 const timesByProfessional: Record<string, readonly string[]> = {
-  marina: ['14:30', '15:30', '16:30'],
+  marina: rescheduleDemoTimes,
   carlos: ['09:00', '10:00', '11:00'],
   ana: ['14:30', '15:30', '16:30'],
   felipe: ['16:00', '17:00', '18:00'],
@@ -23,8 +25,12 @@ const priceFormat = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 2,
 });
 
-export function getBookingOptions(professionalId: string) {
-  const professional: BookingProfessional | undefined = findProfessionalById(professionalId);
+function getMockTimes(professionalId: string, demoProfessional?: BookingProfessional) {
+  return timesByProfessional[professionalId] ?? (demoProfessional ? rescheduleDemoTimes : []);
+}
+
+export function getBookingOptions(professionalId: string, demoProfessional?: BookingProfessional) {
+  const professional = demoProfessional ?? findProfessionalById(professionalId);
   if (!professional) return null;
 
   const today = new Date();
@@ -41,7 +47,7 @@ export function getBookingOptions(professionalId: string) {
       label: dateLabelFormat.format(date),
     };
   });
-  const times = (timesByProfessional[professionalId] ?? []).map((time): BookingTimeSlot => ({ time }));
+  const times = getMockTimes(professionalId, demoProfessional).map((time): BookingTimeSlot => ({ time }));
 
   return { professional, dates, times, priceLabel: priceFormat.format(professional.price) };
 }
@@ -56,11 +62,11 @@ export function isBookingSelectionComplete(
     && options.times.some(({ time }) => time === selection.time);
 }
 
-export function getBookingSummary({ professionalId, date, time }: RequiredBookingSelection) {
-  const professional = findProfessionalById(professionalId);
+export function getBookingSummary({ professionalId, date, time, demoProfessional }: RequiredBookingSelection) {
+  const professional = demoProfessional ?? findProfessionalById(professionalId);
   const selectedDate = new Date(`${date}T00:00:00`);
 
-  if (!professional || !timesByProfessional[professionalId]?.includes(time) || Number.isNaN(selectedDate.getTime())) {
+  if (!professional || !getMockTimes(professionalId, demoProfessional).includes(time) || Number.isNaN(selectedDate.getTime())) {
     return null;
   }
 

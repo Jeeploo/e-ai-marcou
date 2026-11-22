@@ -1,23 +1,93 @@
-import { createContext, useContext, useState, type PropsWithChildren } from 'react';
-import { cancelLocalAppointment, createMockAppointments } from '../controllers/appointmentController';
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type PropsWithChildren } from 'react';
+import { demoPatient } from '../config/api';
+import { canCancelAppointment, cancelLocalAppointment, createMockAppointments } from '../controllers/appointmentController';
 import type { Appointment } from '../models/AppointmentModel';
+import { getApiErrorMessage } from '../services/api';
+import * as service from '../services/appointmentsService';
 
 type AppointmentsState = {
   appointments: readonly Appointment[];
-  cancelAppointment: (appointmentId: string) => void;
+  loading: boolean;
+  error: string | null;
+  demoMode: boolean;
+  refresh: () => Promise<void>;
+  useDemoData: () => void;
+  cancelAppointment: (appointment: Appointment) => Promise<void>;
 };
 
 const AppointmentsContext = createContext<AppointmentsState | null>(null);
 
 export function AppointmentsProvider({ children }: PropsWithChildren) {
-  const [appointments, setAppointments] = useState(() => createMockAppointments());
+  const [remoteAppointments, setRemoteAppointments] = useState<Appointment[]>([]);
+  const [demoAppointments, setDemoAppointments] = useState(createMockAppointments);
+  const [demoMode, setDemoMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const refreshRequest = useRef<Promise<void> | null>(null);
+  const cancellationPending = useRef(false);
 
-  function cancelAppointment(appointmentId: string) {
-    setAppointments((current) => cancelLocalAppointment(current, appointmentId));
+  const refresh = useCallback(async () => {
+    if (refreshRequest.current) return refreshRequest.current;
+    if (cancellationPending.current) return;
+
+    setLoading(true);
+    refreshRequest.current = (async () => {
+      try {
+        setRemoteAppointments(await service.getAppointments(demoPatient.id));
+        setError(null);
+        setDemoMode(false);
+      } catch (error) {
+        setError(getApiErrorMessage(error));
+      } finally {
+        refreshRequest.current = null;
+        setLoading(false);
+      }
+    })();
+    return refreshRequest.current;
+  }, []);
+
+  useEffect(() => { void refresh(); }, [refresh]);
+
+  async function cancelAppointment(appointment: Appointment) {
+    if (cancellationPending.current) throw new Error('Cancelamento em andamento.');
+    if (!canCancelAppointment(appointment)) throw new Error('A consulta não pode mais ser cancelada.');
+    if (demoMode) {
+      setDemoAppointments((current) => cancelLocalAppointment(current, appointment.id));
+      return;
+    }
+
+    cancellationPending.current = true;
+    try {
+      // Aguarda a leitura em curso para que ela não sobrescreva o resultado do DELETE.
+      await refreshRequest.current;
+      const cancelled = await service.cancelAppointment(appointment.id, demoPatient.id);
+      setRemoteAppointments((current) => {
+        const previous = current.find(({ id }) => id === appointment.id) ?? appointment;
+        const updated = {
+          ...cancelled,
+          professionalName: previous.professionalName,
+          specialty: previous.specialty,
+          location: previous.location,
+        };
+        return current.some(({ id }) => id === appointment.id)
+          ? current.map((item) => item.id === appointment.id ? updated : item)
+          : [...current, updated];
+      });
+    } finally {
+      cancellationPending.current = false;
+    }
   }
 
   return (
-    <AppointmentsContext.Provider value={{ appointments, cancelAppointment }}>
+    <AppointmentsContext.Provider value={{
+      appointments: demoMode ? demoAppointments : remoteAppointments,
+      loading,
+      error,
+      demoMode,
+      refresh,
+      useDemoData: () => setDemoMode(true),
+      cancelAppointment,
+    }}>
       {children}
     </AppointmentsContext.Provider>
   );

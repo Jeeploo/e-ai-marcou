@@ -1,19 +1,20 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useRef, useState, type ComponentRef } from 'react';
 import { AccessibilityInfo, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAppointmentDetails } from '../../hooks/useAppointmentDetails';
+import { getApiErrorMessage } from '../../services/api';
+import { AppointmentStatusMessage } from '../components/AppointmentStatusMessage';
 import { useAppointments } from '../../contexts/AppointmentsContext';
 import {
   canCancelAppointment,
-  findAppointmentById,
   getAppointmentDateLabel,
   getAppointmentPriceLabel,
   getAppointmentStatusLabel,
 } from '../../controllers/appointmentController';
 import type { RootStackParamList } from '../../navigation/types';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { BookingDetailsLayout } from '../components/BookingDetailsLayout';
 import { BookingSummary } from '../components/BookingSummary';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -21,19 +22,37 @@ import { PrimaryButton } from '../components/PrimaryButton';
 type AppointmentDetailsScreenProps = NativeStackScreenProps<RootStackParamList, 'AppointmentDetails'>;
 
 export function AppointmentDetailsScreen({ navigation, route }: AppointmentDetailsScreenProps) {
+  const styles = useThemedStyles(createStyles);
   const { appointmentId } = route.params;
-  const { appointments, cancelAppointment } = useAppointments();
+  const { demoMode, cancelAppointment } = useAppointments();
+  const { detail, retry } = useAppointmentDetails(appointmentId);
   const [showCancellation, setShowCancellation] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancellationError, setCancellationError] = useState<string | null>(null);
+  const [cancelled, setCancelled] = useState(false);
+  const cancellationLock = useRef(false);
   const dialogTitle = useRef<ComponentRef<typeof Text>>(null);
-  const appointment = findAppointmentById(appointments, appointmentId);
+  const appointment = detail.status === 'ready' ? detail.appointment : null;
 
   function closeCancellation() {
-    setShowCancellation(false);
+    if (!cancellationLock.current) setShowCancellation(false);
   }
 
-  function confirmCancellation() {
-    cancelAppointment(appointmentId);
-    closeCancellation();
+  async function confirmCancellation() {
+    if (!appointment || cancellationLock.current) return;
+    cancellationLock.current = true;
+    setCancelling(true);
+    setCancellationError(null);
+    try {
+      await cancelAppointment(appointment);
+      setCancelled(true);
+      setShowCancellation(false);
+    } catch (error) {
+      setCancellationError(`Não foi possível cancelar a consulta. ${getApiErrorMessage(error)}`);
+    } finally {
+      cancellationLock.current = false;
+      setCancelling(false);
+    }
   }
 
   function focusDialogTitle() {
@@ -45,9 +64,18 @@ export function AppointmentDetailsScreen({ navigation, route }: AppointmentDetai
   return (
     <>
       <BookingDetailsLayout
-        title={appointment ? 'Detalhes da consulta' : 'Consulta indisponível'}
-        subtitle={appointment ? 'Confira as informações do seu atendimento.' : 'Volte para ver suas consultas.'}
+        title="Detalhes da consulta"
+        subtitle={demoMode ? 'Modo demonstração' : undefined}
       >
+        {detail.status === 'loading' && <AppointmentStatusMessage loading message="Carregando os detalhes da consulta…" />}
+        {detail.status === 'missing' && <AppointmentStatusMessage message="Consulta não encontrada." />}
+        {detail.status === 'error' && (
+          <>
+            <AppointmentStatusMessage message={`Não foi possível carregar os detalhes. ${detail.message}`} />
+            <PrimaryButton label="Tentar novamente" onPress={retry} />
+          </>
+        )}
+        {cancelled && <AppointmentStatusMessage message="Consulta cancelada." />}
         {appointment && (
           <BookingSummary rows={[
             { label: 'Profissional', value: appointment.professionalName },
@@ -65,12 +93,15 @@ export function AppointmentDetailsScreen({ navigation, route }: AppointmentDetai
             label="Cancelar consulta"
             variant="outline"
             destructive
-            onPress={() => setShowCancellation(true)}
+            onPress={() => {
+              setCancellationError(null);
+              setShowCancellation(true);
+            }}
           />
         )}
       </BookingDetailsLayout>
       <Modal
-        visible={showCancellation && canCancel}
+        visible={showCancellation}
         transparent
         animationType="fade"
         statusBarTranslucent
@@ -85,10 +116,14 @@ export function AppointmentDetailsScreen({ navigation, route }: AppointmentDetai
                 Cancelar esta consulta?
               </Text>
               <Text style={styles.dialogBody}>
-                Este horário será cancelado e deixará de ficar reservado para você.
+                {demoMode
+                  ? 'O cancelamento será registrado nos dados de demonstração.'
+                  : 'Este horário será cancelado e deixará de ficar reservado para você.'}
               </Text>
-              <PrimaryButton label="Manter consulta" variant="outline" onPress={closeCancellation} />
-              <PrimaryButton label="Confirmar cancelamento" destructive onPress={confirmCancellation} />
+              {cancelling && <AppointmentStatusMessage loading message="Cancelando consulta…" />}
+              {cancellationError && <AppointmentStatusMessage message={cancellationError} />}
+              <PrimaryButton label="Manter consulta" variant="outline" disabled={cancelling} onPress={closeCancellation} />
+              <PrimaryButton label="Confirmar cancelamento" destructive disabled={cancelling || !canCancel} onPress={confirmCancellation} />
             </View>
           </ScrollView>
         </SafeAreaView>
@@ -97,7 +132,7 @@ export function AppointmentDetailsScreen({ navigation, route }: AppointmentDetai
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.55)' },
   modalContent: {
     flexGrow: 1,

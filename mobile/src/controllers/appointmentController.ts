@@ -1,4 +1,5 @@
-import type { Appointment, AppointmentListCategory, AppointmentStatus } from '../models/AppointmentModel';
+import type { Appointment, AppointmentCatalog, AppointmentDto, AppointmentListCategory, AppointmentStatus } from '../models/AppointmentModel';
+import type { BookingProfessional } from '../models/BookingModel';
 
 const statusLabels: Record<AppointmentStatus, string> = {
   confirmed: 'Confirmada',
@@ -44,18 +45,14 @@ export function createMockAppointments(today = new Date()): Appointment[] {
 }
 
 function getAppointmentDateTime({ date, time }: Appointment) {
-  return new Date(`${date}T${time}:00`).getTime();
-}
-
-function getEffectiveStatus(appointment: Appointment, now: Date): AppointmentStatus {
-  if (appointment.status === 'confirmed' && getAppointmentDateTime(appointment) <= now.getTime()) {
-    return 'completed';
-  }
-  return appointment.status;
+  // A agenda do backend usa o horário de Recife.
+  return Date.parse(`${date}T${time}:00-03:00`);
 }
 
 export function getAppointmentStatusLabel(appointment: Appointment, now = new Date()) {
-  return statusLabels[getEffectiveStatus(appointment, now)];
+  return appointment.status === 'confirmed' && !canCancelAppointment(appointment, now)
+    ? 'Horário passado'
+    : statusLabels[appointment.status];
 }
 
 export function getAppointmentDateLabel({ date }: Appointment) {
@@ -73,7 +70,7 @@ export function listAppointments(
 ) {
   const upcoming = category === 'upcoming';
   return appointments
-    .filter((appointment) => (getEffectiveStatus(appointment, now) === 'confirmed') === upcoming)
+    .filter((appointment) => canCancelAppointment(appointment, now) === upcoming)
     .sort((first, second) => {
       const difference = getAppointmentDateTime(first) - getAppointmentDateTime(second);
       return upcoming ? difference : -difference;
@@ -85,7 +82,7 @@ export function findAppointmentById(appointments: readonly Appointment[], appoin
 }
 
 export function canCancelAppointment(appointment: Appointment, now = new Date()) {
-  return getEffectiveStatus(appointment, now) === 'confirmed';
+  return appointment.status === 'confirmed' && getAppointmentDateTime(appointment) > now.getTime();
 }
 
 export function cancelLocalAppointment(appointments: Appointment[], appointmentId: string, now = new Date()) {
@@ -94,4 +91,31 @@ export function cancelLocalAppointment(appointments: Appointment[], appointmentI
       ? { ...appointment, status: 'cancelled' }
       : appointment,
   );
+}
+
+export function normalizeAppointment(dto: AppointmentDto, catalog?: AppointmentCatalog): Appointment {
+  const professional = catalog?.professionals.find(({ id }) => id === dto.profissionalId);
+  const specialty = catalog?.specialties.find(({ id }) => id === professional?.especialidadeId);
+  const clinic = catalog?.clinics.find(({ id }) => id === dto.clinicaId);
+  return {
+    id: dto.id,
+    professionalId: dto.profissionalId,
+    professionalName: professional?.nome ?? 'Nome do profissional indisponível',
+    specialty: specialty?.nome ?? 'Especialidade indisponível',
+    location: clinic?.nome ?? 'Local indisponível',
+    date: dto.data,
+    time: dto.hora,
+    price: dto.valor,
+    status: dto.status === 'cancelado' ? 'cancelled' : 'confirmed',
+  };
+}
+
+export function getMockRescheduleProfessional(appointment: Appointment): BookingProfessional {
+  return {
+    id: appointment.professionalId,
+    name: appointment.professionalName,
+    specialty: appointment.specialty,
+    neighborhood: appointment.location,
+    price: appointment.price,
+  };
 }

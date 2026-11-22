@@ -1,6 +1,6 @@
 import type { Professional } from './SearchModel';
 
-export type BookingProfessional = Pick<Professional, 'id' | 'name' | 'specialty' | 'neighborhood' | 'price'>;
+export type BookingProfessional = Pick<Professional, 'id' | 'name' | 'neighborhood' | 'price'> & { specialty: string };
 
 export type BookingDateOption = {
   date: string;
@@ -14,6 +14,7 @@ export type BookingTimeSlot = {
 };
 
 export type RequiredBookingSelection = {
+  demoProfessional?: BookingProfessional;
   professionalId: string;
   date: string;
   time: string;

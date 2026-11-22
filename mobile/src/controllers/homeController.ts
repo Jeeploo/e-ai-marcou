@@ -1,8 +1,9 @@
+import { demoPatient } from '../config/api';
 import type { HomeData } from '../models/HomeModel';
 
 export function getHomeData(): HomeData {
   return {
-    patientName: 'Ana',
+    patientName: demoPatient.name,
     nextAppointment: {
       professionalName: 'Dra. Marina Souza',
       specialty: 'Dermatologia',

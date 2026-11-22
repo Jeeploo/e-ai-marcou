@@ -1,10 +1,10 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { PrimaryButton } from './PrimaryButton';
 
 export function EmptySearchState({ onClear }: { onClear: () => void }) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.content} accessibilityLiveRegion="polite">
       <Text accessibilityRole="header" style={styles.title}>Nenhum profissional encontrado</Text>
@@ -14,7 +14,7 @@ export function EmptySearchState({ onClear }: { onClear: () => void }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   content: {
     gap: spacing.md,
     padding: spacing.lg,

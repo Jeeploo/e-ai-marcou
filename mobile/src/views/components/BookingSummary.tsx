@@ -1,14 +1,14 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { StyleSheet, Text, View } from 'react-native';
 import { useCompactLayout } from '../../hooks/useCompactLayout';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 
 type BookingSummaryProps = {
   rows: readonly { label: string; value: string }[];
 };
 
 export function BookingSummary({ rows }: BookingSummaryProps) {
+  const styles = useThemedStyles(createStyles);
   const compact = useCompactLayout();
 
   return (
@@ -28,7 +28,7 @@ export function BookingSummary({ rows }: BookingSummaryProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   card: {
     gap: spacing.md,
     padding: spacing.lg,

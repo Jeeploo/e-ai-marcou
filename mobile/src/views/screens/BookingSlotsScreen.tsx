@@ -1,3 +1,4 @@
+import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -6,18 +7,17 @@ import { getBookingOptions, isBookingSelectionComplete } from '../../controllers
 import { useCompactLayout } from '../../hooks/useCompactLayout';
 import type { BookingSelection } from '../../models/BookingModel';
 import type { RootStackParamList } from '../../navigation/types';
-import { colors } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
-import { typography } from '../../theme/typography';
 import { BookingOptionButton } from '../components/BookingOptionButton';
 import { PrimaryButton } from '../components/PrimaryButton';
 
 type BookingSlotsScreenProps = NativeStackScreenProps<RootStackParamList, 'BookingSlots'>;
 
 export function BookingSlotsScreen({ navigation, route }: BookingSlotsScreenProps) {
-  const { professionalId } = route.params;
+  const styles = useThemedStyles(createStyles);
+  const { professionalId, demoProfessional } = route.params;
   const compact = useCompactLayout();
-  const [options] = useState(() => getBookingOptions(professionalId));
+  const [options] = useState(() => getBookingOptions(professionalId, demoProfessional));
   const [selection, setSelection] = useState<BookingSelection>({ professionalId, date: null, time: null });
   const canReview = isBookingSelectionComplete(selection, options);
 
@@ -27,7 +27,7 @@ export function BookingSlotsScreen({ navigation, route }: BookingSlotsScreenProp
 
   function reviewBooking() {
     if (canReview) {
-      navigation.navigate('BookingReview', { professionalId, date: selection.date, time: selection.time });
+      navigation.navigate('BookingReview', { professionalId, date: selection.date, time: selection.time, demoProfessional });
     }
   }
 
@@ -36,7 +36,7 @@ export function BookingSlotsScreen({ navigation, route }: BookingSlotsScreenProp
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.section}>
           <Text accessibilityRole="header" style={styles.title}>Escolha seu horário</Text>
-          <Text style={styles.body}>Selecione o melhor dia e horário para sua consulta.</Text>
+          <Text style={styles.body}>{demoProfessional ? 'Horários de demonstração. Sua consulta original continuará marcada.' : 'Selecione o melhor dia e horário para sua consulta.'}</Text>
         </View>
         {options ? (
           <>
@@ -97,7 +97,7 @@ export function BookingSlotsScreen({ navigation, route }: BookingSlotsScreenProp
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: {
     width: '100%',
