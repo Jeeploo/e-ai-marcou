@@ -19,6 +19,7 @@ export function NextAppointmentCard({ appointment }: { appointment: NextAppointm
 
 const styles = StyleSheet.create({
   card: {
+    minWidth: 0,
     gap: spacing.sm,
     padding: spacing.md,
     borderWidth: 1,
@@ -35,6 +36,7 @@ const styles = StyleSheet.create({
   name: { color: colors.textPrimary, fontSize: typography.professionalName, fontWeight: '600' },
   specialty: { color: colors.textSecondary, fontSize: typography.caption },
   status: {
+    maxWidth: '100%',
     alignSelf: 'flex-start',
     backgroundColor: colors.secondary,
     color: colors.success,

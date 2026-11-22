@@ -5,16 +5,17 @@ import { typography } from '../../theme/typography';
 
 type SpecialtyButtonProps = {
   label: string;
+  compact: boolean;
   onPress: () => void;
 };
 
-export function SpecialtyButton({ label, onPress }: SpecialtyButtonProps) {
+export function SpecialtyButton({ label, compact, onPress }: SpecialtyButtonProps) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
       onPress={onPress}
-      style={({ pressed }) => [styles.button, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.button, compact && styles.fullWidth, pressed && styles.pressed]}
     >
       <Text style={styles.label}>{label}</Text>
     </Pressable>
@@ -34,6 +35,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: colors.surface,
   },
+  fullWidth: { flexBasis: 'auto', flexGrow: 0 },
   label: { color: colors.primary, fontSize: typography.caption, fontWeight: '600' },
   pressed: { backgroundColor: colors.secondary },
 });
