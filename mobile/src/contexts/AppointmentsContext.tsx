@@ -10,7 +10,7 @@ type AppointmentsState = {
   loading: boolean;
   error: string | null;
   demoMode: boolean;
-  refresh: () => Promise<void>;
+  refresh: (updatedAppointment?: Appointment) => Promise<void>;
   useDemoData: () => void;
   cancelAppointment: (appointment: Appointment) => Promise<void>;
 };
@@ -26,7 +26,16 @@ export function AppointmentsProvider({ children }: PropsWithChildren) {
   const refreshRequest = useRef<Promise<void> | null>(null);
   const cancellationPending = useRef(false);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (updatedAppointment?: Appointment) => {
+    if (updatedAppointment) {
+      // Uma leitura iniciada antes do POST/PATCH pode retornar a lista anterior.
+      await refreshRequest.current;
+      setRemoteAppointments((current) => [
+        ...current.filter(({ id }) => id !== updatedAppointment.id),
+        updatedAppointment,
+      ]);
+      setDemoMode(false);
+    }
     if (refreshRequest.current) return refreshRequest.current;
     if (cancellationPending.current) return;
 
@@ -66,6 +75,7 @@ export function AppointmentsProvider({ children }: PropsWithChildren) {
         const updated = {
           ...cancelled,
           professionalName: previous.professionalName,
+          photoUrl: previous.photoUrl,
           specialty: previous.specialty,
           location: previous.location,
         };

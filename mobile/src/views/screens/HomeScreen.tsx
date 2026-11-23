@@ -2,11 +2,14 @@ import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAppointments } from '../../contexts/AppointmentsContext';
+import { listAppointments } from '../../controllers/appointmentController';
 import { useCompactLayout } from '../../hooks/useCompactLayout';
 import { getHomeData } from '../../controllers/homeController';
 import type { MainTabParamList } from '../../navigation/types';
 import { spacing } from '../../theme/spacing';
 import { AppHeader } from '../components/AppHeader';
+import { AppointmentStatusMessage } from '../components/AppointmentStatusMessage';
 import { NextAppointmentCard } from '../components/NextAppointmentCard';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SpecialtyButton } from '../components/SpecialtyButton';
@@ -16,7 +19,12 @@ type HomeScreenProps = BottomTabScreenProps<MainTabParamList, 'Home'>;
 export function HomeScreen({ navigation }: HomeScreenProps) {
   const styles = useThemedStyles(createStyles);
   const compact = useCompactLayout();
-  const { patientName, nextAppointment, specialties } = getHomeData();
+  const { patientName, specialties } = getHomeData();
+  const { appointments, loading, error, demoMode } = useAppointments();
+  const [nextAppointment] = listAppointments(appointments, 'upcoming');
+  const appointmentMessage = error && !demoMode
+    ? 'Não foi possível carregar a próxima consulta.'
+    : 'Você não tem consultas marcadas.';
   const openSearch = () => navigation.navigate('Search');
   const columns = compact ? 1 : 2;
   const specialtyRows = [];
@@ -38,7 +46,12 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           </View>
 
           <View style={styles.section}>
-            <NextAppointmentCard appointment={nextAppointment} />
+            <NextAppointmentCard appointment={loading ? undefined : nextAppointment}>
+              <AppointmentStatusMessage
+                loading={loading}
+                message={loading ? 'Carregando próxima consulta…' : appointmentMessage}
+              />
+            </NextAppointmentCard>
             <PrimaryButton
               label="Ver minhas consultas"
               variant="outline"

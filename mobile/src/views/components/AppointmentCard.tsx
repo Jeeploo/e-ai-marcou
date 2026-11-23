@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { getAppointmentDateLabel, getAppointmentStatusLabel } from '../../controllers/appointmentController';
 import { useCompactLayout } from '../../hooks/useCompactLayout';
 import type { Appointment } from '../../models/AppointmentModel';
+import { ProfessionalIdentity } from './ProfessionalIdentity';
 import { spacing } from '../../theme/spacing';
 import { PrimaryButton } from './PrimaryButton';
 
@@ -20,10 +21,7 @@ export function AppointmentCard({ appointment, onDetails, onReschedule }: Appoin
 
   return (
     <View style={styles.card}>
-      <View style={styles.identity}>
-        <Text accessibilityRole="header" style={styles.name}>{appointment.professionalName}</Text>
-        <Text style={styles.body}>{appointment.specialty}</Text>
-      </View>
+      <ProfessionalIdentity professionalId={appointment.professionalId} photoUrl={appointment.photoUrl} name={appointment.professionalName} specialty={appointment.specialty} heading />
       <View style={styles.schedule}>
         <Ionicons name="calendar-outline" size={20} color={colors.primary} accessible={false} />
         <Text style={[styles.body, styles.date]}>{getAppointmentDateLabel(appointment)} às {appointment.time}</Text>
@@ -52,8 +50,6 @@ const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
   },
-  identity: { gap: spacing.xs },
-  name: { fontSize: typography.appointmentTitle, fontWeight: '700', color: colors.textPrimary },
   body: { fontSize: typography.body, color: colors.textSecondary },
   schedule: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
   date: { flex: 1 },

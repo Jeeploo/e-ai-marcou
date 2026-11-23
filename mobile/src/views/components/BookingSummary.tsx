@@ -1,18 +1,22 @@
 import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { StyleSheet, Text, View } from 'react-native';
 import { useCompactLayout } from '../../hooks/useCompactLayout';
+import type { Appointment } from '../../models/AppointmentModel';
+import { ProfessionalIdentity } from './ProfessionalIdentity';
 import { spacing } from '../../theme/spacing';
 
 type BookingSummaryProps = {
+  professional: Pick<Appointment, 'professionalId' | 'professionalName' | 'photoUrl' | 'specialty'>;
   rows: readonly { label: string; value: string }[];
 };
 
-export function BookingSummary({ rows }: BookingSummaryProps) {
+export function BookingSummary({ professional, rows }: BookingSummaryProps) {
   const styles = useThemedStyles(createStyles);
   const compact = useCompactLayout();
 
   return (
     <View style={styles.card}>
+      <ProfessionalIdentity professionalId={professional.professionalId} photoUrl={professional.photoUrl} name={professional.professionalName} specialty={professional.specialty} />
       {rows.map(({ label, value }) => (
         <View
           key={label}

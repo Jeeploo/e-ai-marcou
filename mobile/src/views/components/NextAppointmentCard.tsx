@@ -1,18 +1,28 @@
+import type { ReactNode } from 'react';
 import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { StyleSheet, Text, View } from 'react-native';
-import type { NextAppointment } from '../../models/HomeModel';
+import { getAppointmentDateLabel, getAppointmentStatusLabel } from '../../controllers/appointmentController';
+import type { Appointment } from '../../models/AppointmentModel';
+import { ProfessionalIdentity } from './ProfessionalIdentity';
 import { spacing } from '../../theme/spacing';
 
-export function NextAppointmentCard({ appointment }: { appointment: NextAppointment }) {
+export function NextAppointmentCard({ appointment, children }: { appointment?: Appointment; children: ReactNode }) {
   const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.card}>
       <Text accessibilityRole="header" style={styles.heading}>Sua próxima visita</Text>
-      <View style={styles.details}>
-        <Text style={styles.name}>{appointment.professionalName}</Text>
-        <Text style={styles.specialty}>{appointment.specialty}</Text>
-      </View>
-      <Text style={styles.status}>{appointment.statusText}</Text>
+      {appointment ? (
+        <>
+          <ProfessionalIdentity
+            professionalId={appointment.professionalId}
+            photoUrl={appointment.photoUrl}
+            name={appointment.professionalName}
+            specialty={appointment.specialty}
+          />
+          <Text style={styles.date}>{getAppointmentDateLabel(appointment)} às {appointment.time}</Text>
+          <Text style={styles.status}>{getAppointmentStatusLabel(appointment)}</Text>
+        </>
+      ) : children}
     </View>
   );
 }
@@ -32,9 +42,10 @@ const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
     fontSize: typography.appointmentTitle,
     fontWeight: '600',
   },
-  details: { gap: spacing.xs },
-  name: { color: colors.textPrimary, fontSize: typography.professionalName, fontWeight: '600' },
-  specialty: { color: colors.textSecondary, fontSize: typography.caption },
+  date: {
+    color: colors.textSecondary,
+    fontSize: typography.body,
+  },
   status: {
     maxWidth: '100%',
     alignSelf: 'flex-start',

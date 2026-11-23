@@ -77,9 +77,7 @@ export function AppointmentDetailsScreen({ navigation, route }: AppointmentDetai
         )}
         {cancelled && <AppointmentStatusMessage message="Consulta cancelada." />}
         {appointment && (
-          <BookingSummary rows={[
-            { label: 'Profissional', value: appointment.professionalName },
-            { label: 'Especialidade', value: appointment.specialty },
+          <BookingSummary professional={appointment} rows={[
             { label: 'Local', value: appointment.location },
             { label: 'Dia', value: getAppointmentDateLabel(appointment) },
             { label: 'Horário', value: appointment.time },

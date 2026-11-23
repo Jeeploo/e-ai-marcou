@@ -55,7 +55,7 @@ const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.border,
   },
-  column: { flex: 1 },
+  column: { flexBasis: '30%', flexGrow: 1 },
   selected: { borderColor: colors.primary, backgroundColor: colors.secondary },
   pressed: { backgroundColor: colors.secondary },
   detail: { color: colors.textSecondary, fontSize: typography.body, textTransform: 'capitalize' },

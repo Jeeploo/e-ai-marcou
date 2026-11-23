@@ -1,9 +1,10 @@
+import { isRecord } from '../utils/apiData';
 import { apiBaseUrl } from '../config/api';
 
 type ApiErrorKind = 'http' | 'timeout' | 'network' | 'invalid-response';
 
 export class ApiError extends Error {
-  constructor(public readonly kind: ApiErrorKind, message: string, public readonly status?: number) {
+  constructor(public readonly kind: ApiErrorKind, message: string, public readonly status?: number, public readonly detail?: string) {
     super(message);
     this.name = 'ApiError';
   }
@@ -34,7 +35,9 @@ export async function requestJson(path: string, options: RequestInit = {}): Prom
         : response.status === 409
           ? 'A consulta mudou no servidor. Atualize suas consultas e confira o status.'
           : 'O servidor não conseguiu concluir a solicitação. Tente novamente.';
-      throw new ApiError('http', message, response.status);
+      const body: unknown = await response.json().catch(() => undefined);
+      const detail = isRecord(body) && typeof body.detail === 'string' ? body.detail : undefined;
+      throw new ApiError('http', message, response.status, detail);
     }
 
     if (response.status === 204) return undefined;

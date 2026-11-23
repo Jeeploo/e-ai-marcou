@@ -1,5 +1,6 @@
 import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { SpecialtyIcon } from './SpecialtyIcon';
 import { spacing } from '../../theme/spacing';
 
 type SpecialtyButtonProps = {
@@ -16,6 +17,7 @@ export function SpecialtyButton({ label, onPress }: SpecialtyButtonProps) {
       onPress={onPress}
       style={({ pressed }) => [styles.button, pressed && styles.pressed]}
     >
+      <SpecialtyIcon specialty={label} />
       <Text style={styles.label}>{label}</Text>
     </Pressable>
   );
@@ -27,6 +29,8 @@ const createStyles = ({ colors, typography }: AppTheme) => StyleSheet.create({
     minWidth: 0,
     minHeight: 56,
     justifyContent: 'center',
+    alignItems: 'flex-start',
+    gap: spacing.xs,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderWidth: 1,

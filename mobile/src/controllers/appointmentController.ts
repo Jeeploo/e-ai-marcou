@@ -101,6 +101,7 @@ export function normalizeAppointment(dto: AppointmentDto, catalog?: AppointmentC
     id: dto.id,
     professionalId: dto.profissionalId,
     professionalName: professional?.nome ?? 'Nome do profissional indisponível',
+    photoUrl: professional?.fotoUrl,
     specialty: specialty?.nome ?? 'Especialidade indisponível',
     location: clinic?.nome ?? 'Local indisponível',
     date: dto.data,
@@ -110,10 +111,11 @@ export function normalizeAppointment(dto: AppointmentDto, catalog?: AppointmentC
   };
 }
 
-export function getMockRescheduleProfessional(appointment: Appointment): BookingProfessional {
+export function getAppointmentProfessional(appointment: Appointment): BookingProfessional {
   return {
     id: appointment.professionalId,
     name: appointment.professionalName,
+    photoUrl: appointment.photoUrl,
     specialty: appointment.specialty,
     neighborhood: appointment.location,
     price: appointment.price,

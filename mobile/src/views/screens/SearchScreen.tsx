@@ -1,15 +1,16 @@
-import { useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
+import { useAppTheme, useThemedStyles, type AppTheme } from '../../hooks/useAppTheme';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCompactLayout } from '../../hooks/useCompactLayout';
+import { useProfessionalSearch } from '../../hooks/useProfessionalSearch';
+import { AppointmentStatusMessage } from '../components/AppointmentStatusMessage';
 import { getHomeData } from '../../controllers/homeController';
 import {
   clearSearchFilters,
-  searchProfessionals,
   validateSearchFilters,
 } from '../../controllers/searchController';
 import {
@@ -44,7 +45,8 @@ export function SearchScreen({ navigation }: SearchScreenProps) {
   const [location, setLocation] = useState<LocationReference>('Minha localização');
   const [locationsOpen, setLocationsOpen] = useState(false);
 
-  const results = searchProfessionals(query, filters);
+  const { colors } = useAppTheme();
+  const { results, loading, error, demo, retry, useDemo } = useProfessionalSearch(query, filters, location);
   const defaults = clearSearchFilters();
   const chips = [
     { key: 'specialty', label: filters.specialty },
@@ -78,6 +80,9 @@ export function SearchScreen({ navigation }: SearchScreenProps) {
       <FlatList
         data={results}
         keyExtractor={(professional) => professional.id}
+        refreshControl={
+          <RefreshControl refreshing={loading} onRefresh={retry} tintColor={colors.primary} colors={[colors.primary]} />
+        }
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         contentContainerStyle={[styles.list, compact && styles.compactList]}
@@ -140,20 +145,40 @@ export function SearchScreen({ navigation }: SearchScreenProps) {
               </View>
             )}
 
-            <Text accessibilityRole="header" accessibilityLiveRegion="polite" style={styles.results}>
-              {results.length} {results.length === 1 ? 'profissional encontrado' : 'profissionais encontrados'}
-            </Text>
+            {demo && (
+              <View style={styles.group}>
+                <AppointmentStatusMessage message="Dados de demonstração" />
+                <PrimaryButton label="Tentar novamente" variant="outline" onPress={retry} />
+              </View>
+            )}
+            {loading && <AppointmentStatusMessage loading message="Buscando profissionais…" />}
+            {error && (
+              <View style={styles.group}>
+                <AppointmentStatusMessage message="Não foi possível buscar profissionais." />
+                <PrimaryButton label="Tentar novamente" onPress={retry} />
+                <PrimaryButton label="Usar dados de demonstração" variant="outline" onPress={useDemo} />
+              </View>
+            )}
+            {!demo && !loading && !error && filters.order === 'Mais perto' && location === 'Minha localização' &&
+              <Text style={styles.description}>Escolha um endereço salvo para ordenar por distância.</Text>}
+            {!loading && !error && (
+              <Text accessibilityRole="header" accessibilityLiveRegion="polite" style={styles.results}>
+                {results.length} {results.length === 1 ? 'profissional encontrado' : 'profissionais encontrados'}
+              </Text>
+            )}
           </View>
         }
         renderItem={({ item }) => (
           <ProfessionalCard
             compact={compact}
             professional={item}
-            onViewTimes={() => navigation.navigate('BookingSlots', { professionalId: item.id })}
+            onViewTimes={() => navigation.navigate('BookingSlots', {
+              professionalId: item.id, professional: item, mode: 'new', demo,
+            })}
           />
         )}
         ItemSeparatorComponent={ResultSeparator}
-        ListEmptyComponent={<EmptySearchState onClear={clearSearch} />}
+        ListEmptyComponent={!loading && !error ? <EmptySearchState onClear={clearSearch} /> : undefined}
       />
 
       <SearchFiltersModal

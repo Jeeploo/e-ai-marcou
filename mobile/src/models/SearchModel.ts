@@ -9,11 +9,13 @@ export type LocationReference = (typeof locationReferences)[number];
 export type Professional = {
   id: string;
   name: string;
-  specialty: Specialty;
+  photoUrl?: string | null;
+  specialty: string;
   neighborhood: string;
-  distanceKm: number;
+  distanceKm: number | null;
+  distanceLabel: string | null;
   price: number;
-  nextTime: string;
+  nextTime: string | null;
 };
 
 export type SearchFilters = {

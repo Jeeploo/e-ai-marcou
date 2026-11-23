@@ -1,23 +1,20 @@
+import { isPrice, isRecord, isScheduleDate, isScheduleTime } from '../utils/apiData';
 import { normalizeAppointment } from '../controllers/appointmentController';
 import type { AppointmentCatalog, AppointmentDto } from '../models/AppointmentModel';
 import { invalidResponse, requestJson } from './api';
 
 const path = '/api/agendamentos';
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function isAppointmentDto(value: unknown): value is AppointmentDto {
+export function isAppointmentDto(value: unknown): value is AppointmentDto {
   return isRecord(value)
     && typeof value.id === 'string'
     && typeof value.pacienteId === 'string'
     && typeof value.profissionalId === 'string'
     && typeof value.clinicaId === 'string'
-    && typeof value.data === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value.data)
-    && Number.isFinite(Date.parse(`${value.data}T00:00:00Z`))
-    && typeof value.hora === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value.hora)
-    && typeof value.valor === 'number' && Number.isFinite(value.valor) && value.valor >= 0
+    && typeof value.horarioId === 'string'
+    && isScheduleDate(value.data)
+    && isScheduleTime(value.hora)
+    && isPrice(value.valor)
     && (value.status === 'agendado' || value.status === 'cancelado');
 }
 
@@ -26,7 +23,10 @@ function isCatalogEntry(value: unknown): value is { id: string; nome: string } {
 }
 
 function isProfessional(value: unknown): value is AppointmentCatalog['professionals'][number] {
-  return isCatalogEntry(value) && 'especialidadeId' in value && typeof value.especialidadeId === 'string';
+  if (!isRecord(value)) return false;
+  const { especialidadeId, fotoUrl } = value;
+  return isCatalogEntry(value) && typeof especialidadeId === 'string'
+    && (fotoUrl == null || typeof fotoUrl === 'string');
 }
 
 async function getCatalogEntries<T>(path: string, isEntry: (value: unknown) => value is T) {

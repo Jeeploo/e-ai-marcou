@@ -1,5 +1,5 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
-import type { BookingProfessional, RequiredBookingSelection } from '../models/BookingModel';
+import type { BookingConfirmation, BookingRoute, RequiredBookingSelection } from '../models/BookingModel';
 
 export type MainTabParamList = {
   Home: undefined;
@@ -10,8 +10,8 @@ export type MainTabParamList = {
 
 export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList>;
-  BookingSlots: { professionalId: string; demoProfessional?: BookingProfessional };
+  BookingSlots: BookingRoute & { reload?: number };
   BookingReview: RequiredBookingSelection;
-  BookingConfirmation: RequiredBookingSelection;
+  BookingConfirmation: BookingConfirmation;
   AppointmentDetails: { appointmentId: string };
 };

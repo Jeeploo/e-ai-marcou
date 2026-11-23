@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppointments } from '../../contexts/AppointmentsContext';
-import { canCancelAppointment, getMockRescheduleProfessional, listAppointments } from '../../controllers/appointmentController';
+import { canCancelAppointment, getAppointmentProfessional, listAppointments } from '../../controllers/appointmentController';
 import type { AppointmentListCategory } from '../../models/AppointmentModel';
 import type { MainTabParamList, RootStackParamList } from '../../navigation/types';
 import { spacing } from '../../theme/spacing';
@@ -38,7 +38,7 @@ export function AppointmentsScreen({ navigation }: AppointmentsScreenProps) {
         keyExtractor={({ id }) => id}
         contentContainerStyle={styles.content}
         refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={refresh} tintColor={colors.primary} colors={[colors.primary]} />
+          <RefreshControl refreshing={loading} onRefresh={() => { void refresh(); }} tintColor={colors.primary} colors={[colors.primary]} />
         }
         ListHeaderComponent={
           <View style={styles.heading}>
@@ -48,7 +48,7 @@ export function AppointmentsScreen({ navigation }: AppointmentsScreenProps) {
             {error && (
               <View style={styles.notice}>
                 <AppointmentStatusMessage message={`Não foi possível carregar suas consultas. ${error}`} />
-                <PrimaryButton label="Tentar novamente" onPress={refresh} disabled={loading} />
+                <PrimaryButton label="Tentar novamente" onPress={() => { void refresh(); }} disabled={loading} />
                 {!demoMode && <PrimaryButton label="Usar dados de demonstração" variant="outline" onPress={useDemoData} disabled={loading} />}
               </View>
             )}
@@ -83,7 +83,10 @@ export function AppointmentsScreen({ navigation }: AppointmentsScreenProps) {
             onDetails={() => navigation.navigate('AppointmentDetails', { appointmentId: item.id })}
             onReschedule={canCancelAppointment(item) ? () => navigation.navigate('BookingSlots', {
               professionalId: item.professionalId,
-              demoProfessional: getMockRescheduleProfessional(item),
+              professional: getAppointmentProfessional(item),
+              mode: 'reschedule',
+              appointmentId: item.id,
+              demo: demoMode,
             }) : undefined}
           />
         )}
